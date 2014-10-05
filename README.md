@@ -58,3 +58,18 @@ Setup the authentication class settings:
         ]
     ]);
 ```
+
+## Working:
+
+The authentication class checks for the token in two locations:
+
+- `HTTP_AUTHORIZATION` environment variable:
+
+  It first checks if token is passed using `Authorization` request header. 
+  The value should be of form `Bearer <token>`.
+  
+- The query string variable specified using `parameter` config:
+
+  Next it checks if the token is present in query string. The default variable
+  name is `_token` and can be customzied by using the `parameter` config shown
+  above.
