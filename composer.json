@@ -1,5 +1,5 @@
 {
-    "name": "admad/jwt-auth",
+    "name": "admad/cakephp-jwt-auth",
     "type": "cakephp-plugin",
     "description": "CakePHP plugin for authenticating using JSON Web Tokens",
     "keywords":[
