@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/ADmad/cakephp-jwt-auth.png?branch=master)](https://travis-ci.org/ADmad/cakephp-jwt-auth)
 
 Plugin containing AuthComponent's authenticate class for authenticating using
-[JSON Web Tokens](http://jwt.io/). You can read about it's specification in
-detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-27).
+[JSON Web Tokens](http://jwt.io/). You can read about JSON Web Token
+specification in detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-27).
 
 ## Requirements
 
