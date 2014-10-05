@@ -18,14 +18,19 @@ run: `composer require admad/cakephp-jwt-auth:1.0.x-dev`.
 
 ## Usage
 
-In your app's `config/bootstrap.php` add: `CakePlugin::load('ADmad/JwtAuth')`;
+In your app's `config/bootstrap.php` add:
+
+```php
+// In config/bootstrap.php
+CakePlugin::load('ADmad/JwtAuth');
+```
 
 ## Configuration:
 
 Setup the authentication class settings:
 
 ```php
-    //in $components
+    // In AppController::$components
     public $components = [
         'Auth' => [
             'authenticate' => [
@@ -41,7 +46,7 @@ Setup the authentication class settings:
         ]
     ];
 
-    //Or in beforeFilter()
+    // Or in AppController::beforeFilter()
     $this->Auth->config('authenticate', [
         'ADmad/JwtAuth.Jwt' => [
             'parameter' => '_token',
