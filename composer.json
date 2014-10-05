@@ -1,0 +1,44 @@
+{
+    "name": "admad/jwt-auth",
+    "type": "cakephp-plugin",
+    "description": "CakePHP plugin for authenticating using JSON Web Tokens",
+    "keywords":[
+        "cakephp",
+        "authenticate",
+        "authentication",
+        "jwt"
+    ],
+    "homepage": "http://github.com/ADmad/cakephp-jwt-auth",
+    "authors": [
+        {
+            "name":"ADmad",
+            "role":"Author",
+            "homepage":"https://github.com/ADmad"
+        }
+    ],
+    "license": "MIT",
+    "support": {
+        "source":"https://github.com/ADmad/cakephp-jwt-auth",
+        "issues":"https://github.com/ADmad/cakephp-jwt-auth/issues"
+    },
+    "require": {
+        "cakephp/cakephp": "3.0.*-dev",
+        "cakephp/plugin-installer": "*",
+        "firebase/php-jwt": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ADmad\\JwtAuth\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ADmad\\JwtAuth\\Test\\": "tests"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
