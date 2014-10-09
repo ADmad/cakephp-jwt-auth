@@ -83,21 +83,46 @@ class JwtAuthenticate extends BaseAuthenticate {
  * @return bool|array Either false or an array of user information
  */
 	public function getUser(Request $request) {
-		$token = $request->env('HTTP_AUTHORIZATION');
+		$token = $this->_getToken($request);
 		if ($token) {
-			$token = explode(' ', $token);
-			if (!empty($token[1])) {
-				return $this->_findUser($token[1]);
-			}
-		}
-
-		if (!empty($this->_config['parameter']) &&
-			$token = $request->query($this->_config['parameter'])
-		) {
 			return $this->_findUser($token);
 		}
 
 		return false;
+	}
+
+/**
+ * Get token from header or query string
+ *
+ * @param \Cake\Network\Request $request Request object.
+ * @return string|bool Token string if found else false
+ */
+	protected function _getToken($request) {
+		$token = $request->env('HTTP_AUTHORIZATION');
+
+		if (!$token && function_exists('getallheaders')) {
+			$headers = getallheaders();
+			if (isset($headers['Authorization'])) {
+				$token = $headers['Authorization'];
+			}
+		}
+
+		if ($token) {
+			$token = explode(' ', $token);
+			if (!empty($token[1])) {
+				return $token[1];
+			}
+
+			return false;
+		}
+
+		if (!empty($this->_config['parameter']) &&
+			isset($request->query[$this->_config['parameter']])
+		) {
+			$token = $request->query($this->_config['parameter']);
+		}
+
+		return $token ? $token : false;
 	}
 
 /**
