@@ -102,18 +102,15 @@ class JwtAuthenticate extends BaseAuthenticate {
 
 		if (!$token && function_exists('getallheaders')) {
 			$headers = getallheaders();
-			if (isset($headers['Authorization'])) {
+			if (isset($headers['Authorization']) &&
+				substr($headers['Authorization'], 0, 7) === 'Bearer '
+			) {
 				$token = $headers['Authorization'];
 			}
 		}
 
 		if ($token) {
-			$token = explode(' ', $token);
-			if (!empty($token[1])) {
-				return $token[1];
-			}
-
-			return false;
+			return substr($token, 7);
 		}
 
 		if (!empty($this->_config['parameter']) &&
