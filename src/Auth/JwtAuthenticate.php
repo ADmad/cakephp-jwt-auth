@@ -180,10 +180,8 @@ class JwtAuthenticate extends BaseAuthenticate {
 			return;
 		}
 
-		$exception = $this->_config['unauthenticatedException'];
-		// @codingStandardsIgnoreStart
-		throw new $exception($this->_registry->Auth->_config['authError']);
-		// @codingStandardsIgnoreEnd
+		$exception = new $this->_config['unauthenticatedException']($this->_registry->Auth->_config['authError']);
+		throw $exception;
 	}
 
 }
