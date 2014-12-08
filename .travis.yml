@@ -30,14 +30,10 @@ before_script:
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE cakephp_test;' -U postgres; fi"
 
   - sh -c "if [ '$PHPCS' = '1' ]; then composer require cakephp/cakephp-codesniffer:*; fi"
-  - sh -c "if [ '$PHPCS' = '1' ]; then ./vendor/bin/phpcs --config-set installed_paths vendor/cakephp/cakephp-codesniffer; fi"
-
-  - phpenv rehash
-  - set +H
 
 script:
   - sh -c "if [ '$DEFAULT' = '1' ]; then phpunit --stderr; fi"
-  - sh -c "if [ '$PHPCS' = '1' ]; then ./vendor/bin/phpcs -p --extensions=php --standard=CakePHP ./src ./tests; fi"
+  - sh -c "if [ '$PHPCS' = '1' ]; then ./vendor/bin/phpcs -p --extensions=php --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests; fi"
 
 notifications:
   email: false
