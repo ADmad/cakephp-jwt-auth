@@ -23,7 +23,6 @@
     },
     "require": {
         "cakephp/cakephp": "3.0.*-dev",
-        "cakephp/plugin-installer": "*",
         "firebase/php-jwt": "~1.0"
     },
     "autoload": {
