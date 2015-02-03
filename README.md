@@ -22,7 +22,7 @@ In your app's `config/bootstrap.php` add:
 
 ```php
 // In config/bootstrap.php
-CakePlugin::load('ADmad/JwtAuth');
+Plugin::load('ADmad/JwtAuth');
 ```
 
 ## Configuration:
