@@ -82,7 +82,3 @@ of users table.
 
 If `record` key exists it's value will be returned as user record. No check
 will be done against the database.
-
-## TODO:
-
-- Use an event instead of directly calling "registrationCallback" method.
