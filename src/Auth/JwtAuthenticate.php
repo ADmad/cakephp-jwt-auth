@@ -147,24 +147,23 @@ class JwtAuthenticate extends BaseAuthenticate
             return json_decode(json_encode($token->record), true);
         }
 
-        $userModel = $this->_config['userModel'];
-        list($plugin, $model) = pluginSplit($userModel);
         $fields = $this->_config['fields'];
 
-        $conditions = [$model . '.' . $fields['id'] => $token->id];
+        $table = TableRegistry::get($this->_config['userModel']);
+        $conditions = [$table->aliasField($fields['id']) => $token->id];
         if (!empty($this->_config['scope'])) {
             $conditions = array_merge($conditions, $this->_config['scope']);
         }
-        $table = TableRegistry::get($userModel)->find('all');
+
+        $query = $table->find('all')
+            ->where($conditions)
+            ->hydrate(false);
+
         if ($this->_config['contain']) {
             $table = $table->contain($contain);
         }
 
-        $result = $table
-            ->where($conditions)
-            ->hydrate(false)
-            ->first();
-
+        $result = $query->first();
         if (empty($result)) {
             return false;
         }
