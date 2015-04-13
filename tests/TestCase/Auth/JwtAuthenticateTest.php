@@ -28,6 +28,8 @@ class JwtAuthenticateTest extends TestCase
     {
         parent::setUp();
 
+        Security::salt('secret-key');
+
         $this->Registry = $this->getMock('Cake\Controller\ComponentRegistry');
         $this->auth = new JwtAuthenticate($this->Registry, [
             'userModel' => 'Users'

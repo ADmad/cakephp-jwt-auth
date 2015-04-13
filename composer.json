@@ -23,7 +23,7 @@
     },
     "require": {
         "cakephp/cakephp": "~3.0",
-        "firebase/php-jwt": "~1.0"
+        "firebase/php-jwt": "~2.0"
     },
     "autoload": {
         "psr-4": {

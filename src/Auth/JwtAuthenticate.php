@@ -50,6 +50,8 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
      *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
+     * - `allowedAlgs` - List of supported verification algorithms.
+     *   Defaults to ['HS256']. See API of JWT::decode() for more info.
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -60,7 +62,8 @@ class JwtAuthenticate extends BaseAuthenticate
         $this->config([
             'parameter' => '_token',
             'fields' => ['id' => 'id'],
-            'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException'
+            'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
+            'allowedAlgs' => ['HS256']
         ]);
 
         parent::__construct($registry, $config);
@@ -135,7 +138,7 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     protected function _findUser($token, $password = null)
     {
-        $token = JWT::decode($token, Security::salt());
+        $token = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
 
         // Token has full user record.
         if (isset($token->record)) {
