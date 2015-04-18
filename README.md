@@ -1,7 +1,9 @@
 # CakePHP JWT Authenticate plugin
 
 [![Build Status](https://img.shields.io/travis/ADmad/cakephp-jwt-auth/master.svg?style=flat-square)](https://travis-ci.org/ADmad/cakephp-jwt-auth)
+[![Coverage](https://img.shields.io/coveralls/ADmad/cakephp-jwt-auth/master.svg?style=flat-square)](https://coveralls.io/r/ADmad/cakephp-jwt-auth)
 [![Total Downloads](https://img.shields.io/packagist/dt/ADmad/cakephp-jwt-auth.svg?style=flat-square)](https://packagist.org/packages/ADmad/cakephp-jwt-auth)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE.txt)
 
 Plugin containing AuthComponent's authenticate class for authenticating using
 [JSON Web Tokens](http://jwt.io/). You can read about JSON Web Token
