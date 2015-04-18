@@ -119,6 +119,31 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
+     * test for valid token but no matching user found in db
+     *
+     * @return void
+     */
+    public function testWithValidTokenButNoUserInDb()
+    {
+        $request = new Request('posts/index');
+
+        $token = JWT::encode(['id' => 4], Security::salt());
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Test that authenticated() always returns false
+     *
+     * @return void
+     */
+    public function testAuthenticated()
+    {
+        $this->assertFalse($this->auth->authenticate(new Request(), $this->response));
+    }
+
+    /**
      * test that with debug off for invalid token exception from JWT::decode()
      * is re-thrown
      *
@@ -142,6 +167,16 @@ class JwtAuthenticateTest extends TestCase
         $this->Registry->Auth->_config['authError'] = 'Auth error';
 
         $result = $this->auth->unauthenticated(new Request(), $this->response);
+    }
+
+    /**
+     * test unauthenticated() doesn't throw exception is config `unauthenticatedException`
+     * is set to falsey value
+     */
+    public function testUnauthenticatedNoException()
+    {
+        $this->auth->config('unauthenticatedException', false);
+        $this->assertNull($this->auth->unauthenticated(new Request(), $this->response));
     }
 
     /**
