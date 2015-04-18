@@ -124,7 +124,7 @@ class JwtAuthenticateTest extends TestCase
      *
      * @expectedException DomainException
      */
-    public function testUnauthenticted()
+    public function testExceptionForInvalidToken()
     {
         $request = new Request('posts/index');
         $request->env('HTTP_AUTHORIZATION', 'Bearer this.is.invalid');
