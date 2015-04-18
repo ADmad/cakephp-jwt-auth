@@ -119,6 +119,20 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
+     * test that with debug off for invalid token exception from JWT::decode()
+     * is re-thrown
+     *
+     * @expectedException DomainException
+     */
+    public function testUnauthenticted()
+    {
+        $request = new Request('posts/index');
+        $request->env('HTTP_AUTHORIZATION', 'Bearer this.is.invalid');
+
+        $result = $this->auth->getUser($request, $this->response);
+    }
+
+    /**
      * test that getUser() returns false instead of throwing exception with
      * invalid token when debug is off
      *
