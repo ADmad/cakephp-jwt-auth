@@ -109,6 +109,7 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $token = $request->env('HTTP_AUTHORIZATION');
 
+        // @codeCoverageIgnoreStart
         if (!$token && function_exists('getallheaders')) {
             $headers = getallheaders();
             if (isset($headers['Authorization']) &&
@@ -117,6 +118,7 @@ class JwtAuthenticate extends BaseAuthenticate
                 $token = $headers['Authorization'];
             }
         }
+        // @codeCoverageIgnoreEnd
 
         if ($token) {
             return substr($token, 7);
