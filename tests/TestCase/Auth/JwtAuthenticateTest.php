@@ -2,9 +2,9 @@
 namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
 
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
-use Cake\Core\Configure;
 use Cake\Controller\Component\AuthComponent;
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 use Cake\I18n\Time;
 use Cake\Network\Request;
 use Cake\Network\Response;

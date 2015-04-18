@@ -3,8 +3,8 @@ namespace ADmad\JwtAuth\Auth;
 
 use Exception;
 use Cake\Auth\BaseAuthenticate;
-use Cake\Core\Configure;
 use Cake\Controller\ComponentRegistry;
+use Cake\Core\Configure;
 use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
