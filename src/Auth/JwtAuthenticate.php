@@ -1,13 +1,15 @@
 <?php
 namespace ADmad\JwtAuth\Auth;
 
+use Exception;
 use Cake\Auth\BaseAuthenticate;
+use Cake\Core\Configure;
 use Cake\Controller\ComponentRegistry;
 use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
-use \JWT;
+use JWT;
 
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
@@ -138,7 +140,14 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     protected function _findUser($token, $password = null)
     {
-        $token = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+        try {
+            $token = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+        } catch (Exception $e) {
+            if (Configure::read('debug')) {
+                throw $e;
+            }
+            return false;
+        }
 
         // Token has full user record.
         if (isset($token->record)) {

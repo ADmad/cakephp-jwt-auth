@@ -2,6 +2,7 @@
 namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
 
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
+use Cake\Core\Configure;
 use Cake\Controller\Component\AuthComponent;
 use Cake\Controller\Controller;
 use Cake\I18n\Time;
@@ -10,7 +11,7 @@ use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
-use \JWT;
+use JWT;
 
 /**
  * Test case for JwtAuthentication
@@ -115,5 +116,21 @@ class JwtAuthenticateTest extends TestCase
         );
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * test that getUser() returns false instead of throwing exception with
+     * invalid token when debug is off
+     *
+     * @return void
+     */
+    public function testWithInvalidToken()
+    {
+        Configure::write('debug', false);
+        $request = new Request('posts/index');
+
+        $request->env('HTTP_AUTHORIZATION', 'Bearer this.is.invalid');
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
     }
 }
