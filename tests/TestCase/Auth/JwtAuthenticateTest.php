@@ -133,6 +133,18 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
+     * @expectedException Cake\Network\Exception\UnauthorizedException
+     * @expectedExceptionMessage Auth error
+     */
+    public function testUnauthenticated()
+    {
+        $this->Registry->Auth = new \stdClass();
+        $this->Registry->Auth->_config['authError'] = 'Auth error';
+
+        $result = $this->auth->unauthenticated(new Request(), $this->response);
+    }
+
+    /**
      * test that getUser() returns false instead of throwing exception with
      * invalid token when debug is off
      *
