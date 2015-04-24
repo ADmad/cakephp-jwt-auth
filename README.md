@@ -83,3 +83,7 @@ of users table.
 
 If `record` key exists it's value will be returned as user record. No check
 will be done against the database.
+
+## Further reading
+
+For an end to end usage example check out [this](http://www.bravo-kernel.com/2015/04/how-to-add-jwt-authentication-to-a-cakephp-3-rest-api/) blog post by Bravo Kernel.
