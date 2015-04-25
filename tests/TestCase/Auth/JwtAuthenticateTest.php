@@ -18,7 +18,10 @@ use JWT;
  */
 class JwtAuthenticateTest extends TestCase
 {
-    public $fixtures = ['plugin.ADmad\JwtAuth.users'];
+    public $fixtures = [
+        'plugin.ADmad\JwtAuth.users',
+        'plugin.ADmad\JwtAuth.groups',
+    ];
 
     /**
      * setup
@@ -55,6 +58,7 @@ class JwtAuthenticateTest extends TestCase
 
         $expected = array(
             'id' => 1,
+            'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
@@ -81,6 +85,7 @@ class JwtAuthenticateTest extends TestCase
 
         $expected = array(
             'id' => 1,
+            'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
@@ -129,6 +134,42 @@ class JwtAuthenticateTest extends TestCase
 
         $token = JWT::encode(['id' => 4], Security::salt());
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+    }
+
+    /**
+     * test contain
+     *
+     * @return void
+     */
+    public function testFindUserWithContain()
+    {
+        $request = new Request('posts/index');
+
+        $expected = array(
+            'id' => 1,
+            'group_id' => 1,
+            'user_name' => 'admad',
+            'email' => 'admad@example.com',
+            'created' => new Time('2014-03-17 01:18:23'),
+            'updated' => new Time('2014-03-17 01:20:31'),
+            'group' => [
+                'id' => 1,
+                'title' => 'admin'
+            ]
+        );
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
+
+        $this->auth->config('contain', ['Groups']);
+        $table = TableRegistry::get('Users');
+        $table->belongsTo('Groups');
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertEquals($expected, $result);
+
+        $this->setExpectedException('UnexpectedValueException');
+        $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }

@@ -171,7 +171,7 @@ class JwtAuthenticate extends BaseAuthenticate
             ->hydrate(false);
 
         if ($this->_config['contain']) {
-            $table = $table->contain($contain);
+            $query = $query->contain($this->_config['contain']);
         }
 
         $result = $query->first();
