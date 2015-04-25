@@ -56,14 +56,14 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
 
-        $expected = array(
+        $expected = [
             'id' => 1,
             'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
             'updated' => new Time('2014-03-17 01:20:31')
-        );
+        ];
         $request = new Request('posts/index?_token=' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
@@ -83,14 +83,14 @@ class JwtAuthenticateTest extends TestCase
     {
         $request = new Request('posts/index');
 
-        $expected = array(
+        $expected = [
             'id' => 1,
             'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
             'updated' => new Time('2014-03-17 01:20:31')
-        );
+        ];
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
@@ -147,7 +147,7 @@ class JwtAuthenticateTest extends TestCase
     {
         $request = new Request('posts/index');
 
-        $expected = array(
+        $expected = [
             'id' => 1,
             'group_id' => 1,
             'user_name' => 'admad',
@@ -158,7 +158,7 @@ class JwtAuthenticateTest extends TestCase
                 'id' => 1,
                 'title' => 'admin'
             ]
-        );
+        ];
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
 
         $this->auth->config('contain', ['Groups']);
