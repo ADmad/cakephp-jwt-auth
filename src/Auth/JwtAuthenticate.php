@@ -74,8 +74,8 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Unused, since this is a stateless authentication provider.
      *
-     * @param Request $request The request object.
-     * @param Response $response Response object.
+     * @param \Cake\Network\Request $request The request object.
+     * @param \Cake\Network\Response $response Response object.
      * @return bool Always false.
      */
     public function authenticate(Request $request, Response $response)
