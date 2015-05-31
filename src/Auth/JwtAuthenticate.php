@@ -72,22 +72,22 @@ class JwtAuthenticate extends BaseAuthenticate
     }
 
     /**
-     * Unused, since this is a stateless authentication provider.
+     * Get user record based on info available in JWT.
      *
      * @param \Cake\Network\Request $request The request object.
      * @param \Cake\Network\Response $response Response object.
-     * @return bool Always false.
+     * @return bool|array User record array or false on failure.
      */
     public function authenticate(Request $request, Response $response)
     {
-        return false;
+        return $this->getUser($request);
     }
 
     /**
-     * Get token information from the request.
+     * Get user record based on info available in JWT.
      *
      * @param \Cake\Network\Request $request Request object.
-     * @return bool|array Either false or an array of user information
+     * @return bool|array User record array or false on failure.
      */
     public function getUser(Request $request)
     {
@@ -100,10 +100,10 @@ class JwtAuthenticate extends BaseAuthenticate
     }
 
     /**
-     * Get token from header or query string
+     * Get token from header or query string.
      *
      * @param \Cake\Network\Request $request Request object.
-     * @return string|bool Token string if found else false
+     * @return string|bool Token string if found else false.
      */
     protected function _getToken($request)
     {
