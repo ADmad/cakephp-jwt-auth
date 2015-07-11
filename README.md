@@ -45,9 +45,6 @@ Setup `AuthComponent`:
         parent::initialize();
         
         $this->loadComponent('Auth', [
-            // This config is available since CakePHP 3.1.
-            // It makes user info available in controller's beforeFilter() which is not possible in CakePHP 3.0.
-            'checkAuthIn' => 'Controller.initialize',
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
                     'parameter' => '_token',
@@ -57,7 +54,11 @@ Setup `AuthComponent`:
                         'id' => 'id'
                     ]
                 ]
-            ]
+            ],
+            'unauthorizedRedirect' => false,
+            // Config below is available since CakePHP 3.1.
+            // It makes user info available in controller's beforeFilter() which is not possible in CakePHP 3.0.
+            'checkAuthIn' => 'Controller.initialize',
         ]);
     }
 ```
