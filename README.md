@@ -15,9 +15,9 @@ specification in detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json
 
 ## Installation
 
-_[Composer]_
-
-run: `composer require admad/cakephp-jwt-auth:1.0.x-dev`.
+```sh
+composer require admad/cakephp-jwt-auth:1.0.x-dev
+```
 
 ## Usage
 
@@ -28,15 +28,27 @@ In your app's `config/bootstrap.php` add:
 Plugin::load('ADmad/JwtAuth');
 ```
 
+or using cake's console:
+
+```sh
+./bin/cake plugin load ADmad/JwtAuth
+```
+
 ## Configuration:
 
-Setup the authentication class settings:
+Setup `AuthComponent`:
 
 ```php
-    // In AppController::$components
-    public $components = [
-        'Auth' => [
-            'authenticate' => [
+    // In your controller, for e.g. src/Api/AppController.php
+    public function initialize()
+    {
+        parent::initialize();
+        
+        $this->loadComponent('Auth', [
+            // This config is available since CakePHP 3.1.
+            // It makes user info available in controller's beforeFilter() which is not possible in CakePHP 3.0.
+            'checkAuthIn' => 'Controller.initialize',
+            'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
                     'parameter' => '_token',
                     'userModel' => 'Users',
@@ -46,20 +58,8 @@ Setup the authentication class settings:
                     ]
                 ]
             ]
-        ]
-    ];
-
-    // Or in AppController::beforeFilter()
-    $this->Auth->config('authenticate', [
-        'ADmad/JwtAuth.Jwt' => [
-            'parameter' => '_token',
-            'userModel' => 'Users',
-            'scope' => ['Users.active' => 1],
-            'fields' => [
-                'id' => 'id'
-            ]
-        ]
-    ]);
+        ]);
+    }
 ```
 
 ## Working
@@ -83,6 +83,12 @@ of users table.
 
 If `record` key exists it's value will be returned as user record. No check
 will be done against the database.
+
+## Additional Info
+
+`AuthComponent` performs it's authentication routine for stateless auth *after* your controller's `beforeFilter()` has run. So trying to get user info using `$this->Auth->user()` in `beforeFilter()` will always return `null`.
+
+As of CakPHP 3.1 though you can set a new config option `checkAuthIn` to `Controller.initialize` which makes `AuthComponent` do the authentication routine before controller's `beforeFilter()` is called.
 
 ## Further reading
 
