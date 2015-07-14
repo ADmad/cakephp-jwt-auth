@@ -41,7 +41,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * - `parameter` - The url parameter name of the token. Defaults to `_token`.
      *   First $_SERVER['HTTP_AUTHORIZATION'] is checked for token value.
-     *   It's value should be of form "Bearer <token>". If empty this query string
+     *   Its value should be of form "Bearer <token>". If empty this query string
      *   paramater is checked.
      * - `userModel` - The model name of the User, defaults to `Users`.
      * - `fields` - Has key `id` whose value contains primary key field name.
