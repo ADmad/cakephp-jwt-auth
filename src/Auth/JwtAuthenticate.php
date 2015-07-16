@@ -167,14 +167,13 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         $query = $table->find('all')
-            ->where($conditions)
-            ->hydrate(false);
+            ->where($conditions);
 
         if ($this->_config['contain']) {
             $query = $query->contain($this->_config['contain']);
         }
 
-        $result = $query->first();
+        $result = $query->first()->toArray();
         if (empty($result)) {
             return false;
         }
