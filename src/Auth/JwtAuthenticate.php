@@ -173,7 +173,7 @@ class JwtAuthenticate extends BaseAuthenticate
             $query = $query->contain($this->_config['contain']);
         }
 
-        $result = $query->first();
+        $result = $query->first()->toArray();
         if (empty($result)) {
             return false;
         }
