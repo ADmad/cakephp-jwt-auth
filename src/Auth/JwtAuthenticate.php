@@ -14,7 +14,7 @@ use JWT;
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
  *
- * {{{
+ * ```
  *  $this->Auth->config('authenticate', [
  *      'ADmad/JwtAuth.Jwt' => [
  *          'parameter' => '_token',
@@ -25,7 +25,7 @@ use JWT;
  *          ],
  *      ]
  *  ]);
- * }}}
+ * ```
  *
  * @copyright 2014 A. Sarela aka ADmad
  * @license MIT
