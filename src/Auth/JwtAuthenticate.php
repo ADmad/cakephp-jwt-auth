@@ -43,6 +43,13 @@ class JwtAuthenticate extends BaseAuthenticate
     protected $_token;
 
     /**
+     * Exception
+     *
+     * @var \Exception
+     */
+    protected $_error;
+
+    /**
      * Constructor.
      *
      * Settings for this object.
@@ -169,21 +176,19 @@ class JwtAuthenticate extends BaseAuthenticate
      * Decode JWT token.
      *
      * @param string $token JWT token to decode.
-     * @return object The JWT's payload as a PHP object. On failure returns false
-     *   if debug is off else throws the exception thrown by \Firebase\JWT\JWT
+     * @return object|null The JWT's payload as a PHP object, null on failure.
      */
     protected function _decode($token)
     {
         try {
             $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            return $payload;
         } catch (Exception $e) {
             if (Configure::read('debug')) {
                 throw $e;
             }
-            return false;
+            $this->_error = $e;
         }
-
-        return $payload;
     }
 
     /**
@@ -203,7 +208,9 @@ class JwtAuthenticate extends BaseAuthenticate
             return;
         }
 
-        $exception = new $this->_config['unauthenticatedException']($this->_registry->Auth->_config['authError']);
+        $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
+
+        $exception = new $this->_config['unauthenticatedException']($message);
         throw $exception;
     }
 }
