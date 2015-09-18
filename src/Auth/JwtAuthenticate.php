@@ -165,32 +165,32 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function token($request = null)
     {
-        if ($request) {
-            $token = $request->env('HTTP_AUTHORIZATION');
-
-            // @codeCoverageIgnoreStart
-            if (!$token && function_exists('getallheaders')) {
-                $headers = array_change_key_case(getallheaders());
-                if (isset($headers['authorization']) &&
-                    substr($headers['authorization'], 0, 7) === 'Bearer '
-                ) {
-                    $token = $headers['authorization'];
-                }
-            }
-            // @codeCoverageIgnoreEnd
-
-            if ($token) {
-                return substr($token, 7);
-            }
-
-            if (!empty($this->_config['parameter'])) {
-                $token = $request->query($this->_config['parameter']);
-            }
-
-            $this->_token = $token ?: null;
+        if (!$request) {
+            return $this->_token;
         }
 
-        return $this->_token;
+        $token = $request->env('HTTP_AUTHORIZATION');
+
+        // @codeCoverageIgnoreStart
+        if (!$token && function_exists('getallheaders')) {
+            $headers = array_change_key_case(getallheaders());
+            if (isset($headers['authorization']) &&
+                substr($headers['authorization'], 0, 7) === 'Bearer '
+            ) {
+                $token = $headers['authorization'];
+            }
+        }
+        // @codeCoverageIgnoreEnd
+
+        if ($token) {
+            return $this->_token = substr($token, 7);
+        }
+
+        if (!empty($this->_config['parameter'])) {
+            $token = $request->query($this->_config['parameter']);
+        }
+
+        return $this->_token = $token;
     }
 
     /**
