@@ -36,6 +36,13 @@ class JwtAuthenticate extends BaseAuthenticate
 {
 
     /**
+     * Parsed token
+     *
+     * @var string|null
+     */
+    protected $_token;
+
+    /**
      * Constructor.
      *
      * Settings for this object.
@@ -92,7 +99,7 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function getUser(Request $request)
     {
-        $token = $this->_getToken($request);
+        $token = $this->token($request);
         if (empty($token)) {
             return false;
         }
@@ -126,32 +133,36 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get token from header or query string.
      *
      * @param \Cake\Network\Request $request Request object.
-     * @return string|bool Token string if found else false.
+     * @return string|null Token string if found else null.
      */
-    protected function _getToken($request)
+    protected function token($request = null)
     {
-        $token = $request->env('HTTP_AUTHORIZATION');
+        if ($request) {
+            $token = $request->env('HTTP_AUTHORIZATION');
 
-        // @codeCoverageIgnoreStart
-        if (!$token && function_exists('getallheaders')) {
-            $headers = array_change_key_case(getallheaders());
-            if (isset($headers['authorization']) &&
-                substr($headers['authorization'], 0, 7) === 'Bearer '
-            ) {
-                $token = $headers['authorization'];
+            // @codeCoverageIgnoreStart
+            if (!$token && function_exists('getallheaders')) {
+                $headers = array_change_key_case(getallheaders());
+                if (isset($headers['authorization']) &&
+                    substr($headers['authorization'], 0, 7) === 'Bearer '
+                ) {
+                    $token = $headers['authorization'];
+                }
             }
-        }
-        // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
 
-        if ($token) {
-            return substr($token, 7);
+            if ($token) {
+                return substr($token, 7);
+            }
+
+            if (!empty($this->_config['parameter'])) {
+                $token = $request->query($this->_config['parameter']);
+            }
+
+            $this->_token = $token ?: null;
         }
 
-        if (!empty($this->_config['parameter'])) {
-            $token = $request->query($this->_config['parameter']);
-        }
-
-        return $token ?: false;
+        return $this->_token;
     }
 
     /**
