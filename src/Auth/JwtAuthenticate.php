@@ -142,7 +142,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * @param \Cake\Network\Request $request Request object.
      * @return string|null Token string if found else null.
      */
-    protected function token($request = null)
+    public function token($request = null)
     {
         if ($request) {
             $token = $request->env('HTTP_AUTHORIZATION');
