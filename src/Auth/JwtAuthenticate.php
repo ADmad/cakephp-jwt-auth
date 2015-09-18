@@ -17,11 +17,10 @@ use Firebase\JWT\JWT;
  * ```
  *  $this->Auth->config('authenticate', [
  *      'ADmad/JwtAuth.Jwt' => [
- *          'parameter' => '_token',
+ *          'parameter' => 'token',
  *          'userModel' => 'Users',
- *          'scope' => ['User.active' => 1]
  *          'fields' => [
- *              'id' => 'id'
+ *              'username' => 'id'
  *          ],
  *      ]
  *  ]);
@@ -61,16 +60,17 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * Settings for this object.
      *
-     * - `parameter` - The url parameter name of the token. Defaults to `_token`.
+     * - `parameter` - The url parameter name of the token. Defaults to `token`.
      *   First $_SERVER['HTTP_AUTHORIZATION'] is checked for token value.
      *   Its value should be of form "Bearer <token>". If empty this query string
      *   paramater is checked.
      * - `userModel` - The model name of the User, defaults to `Users`.
-     * - `fields` - Has key `id` whose value contains primary key field name.
-     *   Defaults to ['id' => 'id'].
+     * - `fields` - Key `username` denotes the identifier field for fetching user
+     *   record. The `sub` claim of JWT must contain identifier value.
+     *   Defaults to ['username' => 'id', 'password' => 'password'].
      * - `scope` - Additional conditions to use when looking up and authenticating
      *   users, i.e. `['Users.is_active' => 1].`
-     * - `contain` - Extra models to contain.
+     * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
      *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
@@ -160,7 +160,7 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Get token from header or query string.
      *
-     * @param \Cake\Network\Request $request Request object.
+     * @param \Cake\Network\Request|null $request Request object.
      * @return string|null Token string if found else null.
      */
     public function token($request = null)
