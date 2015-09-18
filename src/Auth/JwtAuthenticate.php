@@ -43,6 +43,13 @@ class JwtAuthenticate extends BaseAuthenticate
     protected $_token;
 
     /**
+     * Payload data
+     *
+     * @var object|null
+     */
+    protected $_payload;
+
+    /**
      * Exception
      *
      * @var \Exception
@@ -106,15 +113,7 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function getUser(Request $request)
     {
-        $token = $this->token($request);
-        if (empty($token)) {
-            return false;
-        }
-
-        $payload = $this->_decode($token);
-        if (!$payload) {
-            return false;
-        }
+        $payload = $this->payload($request);
 
         // Token has full user record.
         if (isset($payload->record)) {
@@ -134,6 +133,28 @@ class JwtAuthenticate extends BaseAuthenticate
 
         unset($user[$this->_config['fields']['password']]);
         return $user;
+    }
+
+    /**
+     * Get payload data
+     *
+     * @param \Cake\Network\Request|null $request Request instance or null
+     * @return object|null Payload object on success, null on failurec
+     */
+    public function payload($request = null)
+    {
+        if (!$request) {
+            return $this->_payload;
+        }
+
+        $payload = null;
+
+        $token = $this->token($request);
+        if ($token) {
+            $payload = $this->_decode($token);
+        }
+
+        return $this->_payload = $payload;
     }
 
     /**
