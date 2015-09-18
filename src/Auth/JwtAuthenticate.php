@@ -34,6 +34,7 @@ use Firebase\JWT\JWT;
  */
 class JwtAuthenticate extends BaseAuthenticate
 {
+
     /**
      * Constructor.
      *
@@ -124,13 +125,11 @@ class JwtAuthenticate extends BaseAuthenticate
             return substr($token, 7);
         }
 
-        if (!empty($this->_config['parameter']) &&
-            isset($request->query[$this->_config['parameter']])
-        ) {
+        if (!empty($this->_config['parameter'])) {
             $token = $request->query($this->_config['parameter']);
         }
 
-        return $token ? $token : false;
+        return $token ?: false;
     }
 
     /**
