@@ -11,7 +11,7 @@ use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
-use JWT;
+use Firebase\JWT\JWT;
 
 /**
  * Test case for JwtAuthentication

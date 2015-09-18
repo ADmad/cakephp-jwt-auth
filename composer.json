@@ -2,7 +2,7 @@
     "name": "admad/cakephp-jwt-auth",
     "type": "cakephp-plugin",
     "description": "CakePHP plugin for authenticating using JSON Web Tokens",
-    "keywords":[
+    "keywords": [
         "cakephp",
         "authenticate",
         "authentication",
@@ -23,7 +23,7 @@
     },
     "require": {
         "cakephp/cakephp": "~3.0",
-        "firebase/php-jwt": "~2.0"
+        "firebase/php-jwt": "~3.0"
     },
     "autoload": {
         "psr-4": {
@@ -37,7 +37,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "1.1.x-dev"
         }
     }
 }

@@ -9,7 +9,7 @@ use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 use Exception;
-use JWT;
+use Firebase\JWT\JWT;
 
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
