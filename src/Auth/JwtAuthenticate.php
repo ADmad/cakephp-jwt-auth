@@ -64,7 +64,7 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $this->config([
             'parameter' => '_token',
-            'fields' => ['id' => 'id'],
+            'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
             'allowedAlgs' => ['HS256']
         ]);
@@ -93,11 +93,33 @@ class JwtAuthenticate extends BaseAuthenticate
     public function getUser(Request $request)
     {
         $token = $this->_getToken($request);
-        if ($token) {
-            return $this->_findUser($token);
+        if (empty($token)) {
+            return false;
         }
 
-        return false;
+        $payload = $this->_decode($token);
+        if (!$payload) {
+            return false;
+        }
+
+        // Token has full user record.
+        if (isset($payload->record)) {
+            // Trick to convert object of stdClass to array. Typecasting to
+            // array doesn't convert property values which are themselves objects.
+            return json_decode(json_encode($payload->record), true);
+        }
+
+        if (!isset($payload->sub)) {
+            return false;
+        }
+
+        $user = $this->_findUser($payload->sub);
+        if (!$user) {
+            return false;
+        }
+
+        unset($user[$this->_config['fields']['password']]);
+        return $user;
     }
 
     /**
@@ -133,16 +155,16 @@ class JwtAuthenticate extends BaseAuthenticate
     }
 
     /**
-     * Find a user record.
+     * Decode JWT token.
      *
-     * @param string $token The token identifier.
-     * @param string $password Unused password.
-     * @return bool|array Either false on failure, or an array of user data.
+     * @param string $token JWT token to decode.
+     * @return object The JWT's payload as a PHP object. On failure returns false
+     *   if debug is off else throws the exception thrown by \Firebase\JWT\JWT
      */
-    protected function _findUser($token, $password = null)
+    protected function _decode($token)
     {
         try {
-            $token = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
         } catch (Exception $e) {
             if (Configure::read('debug')) {
                 throw $e;
@@ -150,35 +172,7 @@ class JwtAuthenticate extends BaseAuthenticate
             return false;
         }
 
-        // Token has full user record.
-        if (isset($token->record)) {
-            // Trick to convert object of stdClass to array. Typecasting to
-            // array doesn't convert property values which are themselves objects.
-            return json_decode(json_encode($token->record), true);
-        }
-
-        $fields = $this->_config['fields'];
-
-        $table = TableRegistry::get($this->_config['userModel']);
-        $conditions = [$table->aliasField($fields['id']) => $token->id];
-        if (!empty($this->_config['scope'])) {
-            $conditions = array_merge($conditions, $this->_config['scope']);
-        }
-
-        $query = $table->find('all')
-            ->where($conditions);
-
-        if ($this->_config['contain']) {
-            $query = $query->contain($this->_config['contain']);
-        }
-
-        $result = $query->first();
-        if (empty($result)) {
-            return false;
-        }
-
-        unset($result[$fields['password']]);
-        return $result->toArray();
+        return $payload;
     }
 
     /**

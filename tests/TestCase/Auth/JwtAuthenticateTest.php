@@ -39,7 +39,7 @@ class JwtAuthenticateTest extends TestCase
             'userModel' => 'Users'
         ]);
 
-        $this->token = JWT::encode(['id' => 1], Security::salt());
+        $this->token = JWT::encode(['sub' => 1], Security::salt());
 
         $this->response = $this->getMock('Cake\Network\Response');
     }
