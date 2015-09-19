@@ -84,6 +84,8 @@ class JwtAuthenticate extends BaseAuthenticate
     public function __construct(ComponentRegistry $registry, $config)
     {
         $this->config([
+            'header' => 'authorization',
+            'prefix' => 'bearer',
             'parameter' => 'token',
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
@@ -165,28 +167,15 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function token($request = null)
     {
+        $config  = $this->_config;
+
         if (!$request) {
             return $this->_token;
         }
 
-        $token = $request->env('HTTP_AUTHORIZATION');
-        if (!$token) {
-            $token = $request->env('REDIRECT_HTTP_AUTHORIZATION');
-        }
-
-        // @codeCoverageIgnoreStart
-        if (!$token && function_exists('getallheaders')) {
-            $headers = array_change_key_case(getallheaders());
-            if (isset($headers['authorization']) &&
-                substr($headers['authorization'], 0, 7) === 'Bearer '
-            ) {
-                $token = $headers['authorization'];
-            }
-        }
-        // @codeCoverageIgnoreEnd
-
-        if ($token) {
-            return $this->_token = substr($token, 7);
+        $header = $request->header($config['header']);
+        if ($header) {
+            return $this->_token = trim(str_ireplace($config['prefix'], '', $header));
         }
 
         if (!empty($this->_config['parameter'])) {
