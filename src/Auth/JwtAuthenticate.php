@@ -170,6 +170,9 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         $token = $request->env('HTTP_AUTHORIZATION');
+        if (!$token) {
+            $token = $request->env('REDIRECT_HTTP_AUTHORIZATION');
+        }
 
         // @codeCoverageIgnoreStart
         if (!$token && function_exists('getallheaders')) {
