@@ -84,7 +84,7 @@ class JwtAuthenticate extends BaseAuthenticate
     public function __construct(ComponentRegistry $registry, $config)
     {
         $this->config([
-            'parameter' => '_token',
+            'parameter' => 'token',
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
             'allowedAlgs' => ['HS256']

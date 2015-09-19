@@ -64,7 +64,7 @@ class JwtAuthenticateTest extends TestCase
             'created' => new Time('2014-03-17 01:18:23'),
             'updated' => new Time('2014-03-17 01:20:31')
         ];
-        $request = new Request('posts/index?_token=' . $this->token);
+        $request = new Request('posts/index?token=' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
