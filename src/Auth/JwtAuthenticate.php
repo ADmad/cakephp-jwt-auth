@@ -167,7 +167,7 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function token($request = null)
     {
-        $config  = $this->_config;
+        $config = $this->_config;
 
         if (!$request) {
             return $this->_token;
