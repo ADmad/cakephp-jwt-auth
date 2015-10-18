@@ -43,7 +43,7 @@ Setup `AuthComponent`:
     public function initialize()
     {
         parent::initialize();
-        
+
         $this->loadComponent('Auth', [
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [

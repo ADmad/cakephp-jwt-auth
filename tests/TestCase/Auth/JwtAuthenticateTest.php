@@ -102,11 +102,11 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test authenticate token with user record
+     * test returning payload without querying database.
      *
      * @return void
      */
-    public function testAuthenticateWithUserRecord()
+    public function testQueryDatasourceFalse()
     {
         $request = new Request('posts/index');
 
@@ -117,8 +117,9 @@ class JwtAuthenticateTest extends TestCase
         ];
         $request->env(
             'HTTP_AUTHORIZATION',
-            'Bearer ' . JWT::encode(['record' => $expected], Security::salt())
+            'Bearer ' . JWT::encode($expected, Security::salt())
         );
+        $this->auth->config('queryDatasource', false);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
     }

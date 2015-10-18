@@ -60,22 +60,27 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * Settings for this object.
      *
+     * - `header` - Header name to check. Defaults to `'authorization'`.
+     * - `prefix` - Token prefix. Defaults to `'bearer'`.
      * - `parameter` - The url parameter name of the token. Defaults to `token`.
      *   First $_SERVER['HTTP_AUTHORIZATION'] is checked for token value.
      *   Its value should be of form "Bearer <token>". If empty this query string
      *   paramater is checked.
-     * - `userModel` - The model name of the User, defaults to `Users`.
+     * - `allowedAlgs` - List of supported verification algorithms.
+     *   Defaults to ['HS256']. See API of JWT::decode() for more info.
+     * - `queryDatasource` - Boolean indicating whether the `sub` claim of JWT
+     *   token should be used to query the user model and get user record. If
+     *   set to `false` JWT's payload is directly retured. Defaults to `true`.
+     * - `userModel` - The model name of users, defaults to `Users`.
      * - `fields` - Key `username` denotes the identifier field for fetching user
      *   record. The `sub` claim of JWT must contain identifier value.
-     *   Defaults to ['username' => 'id', 'password' => 'password'].
+     *   Defaults to ['username' => 'id'].
      * - `scope` - Additional conditions to use when looking up and authenticating
      *   users, i.e. `['Users.is_active' => 1].`
      * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
      *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
-     * - `allowedAlgs` - List of supported verification algorithms.
-     *   Defaults to ['HS256']. See API of JWT::decode() for more info.
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -87,9 +92,10 @@ class JwtAuthenticate extends BaseAuthenticate
             'header' => 'authorization',
             'prefix' => 'bearer',
             'parameter' => 'token',
+            'allowedAlgs' => ['HS256'],
+            'queryDatasource' => true,
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
-            'allowedAlgs' => ['HS256']
         ]);
 
         parent::__construct($registry, $config);
@@ -117,11 +123,8 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $payload = $this->payload($request);
 
-        // Token has full user record.
-        if (isset($payload->record)) {
-            // Trick to convert object of stdClass to array. Typecasting to
-            // array doesn't convert property values which are themselves objects.
-            return json_decode(json_encode($payload->record), true);
+        if (!$this->_config['queryDatasource']) {
+            return json_decode(json_encode($payload), true);
         }
 
         if (!isset($payload->sub)) {
