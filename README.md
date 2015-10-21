@@ -87,9 +87,12 @@ will be done against the database.
 
 ## Additional Info
 
+For stateless authentication you need to set the `AuthComponent` "storage" value to be "Memory" otherwise `AuthComponent` will write to session.
+
 `AuthComponent` performs it's authentication routine for stateless auth *after* your controller's `beforeFilter()` has run. So trying to get user info using `$this->Auth->user()` in `beforeFilter()` will always return `null`.
 
 As of CakPHP 3.1 though you can set a new config option `checkAuthIn` to `Controller.initialize` which makes `AuthComponent` do the authentication routine before controller's `beforeFilter()` is called.
+
 
 ## Further reading
 
