@@ -75,8 +75,6 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `fields` - Key `username` denotes the identifier field for fetching user
      *   record. The `sub` claim of JWT must contain identifier value.
      *   Defaults to ['username' => 'id'].
-     * - `scope` - Additional conditions to use when looking up and authenticating
-     *   users, i.e. `['Users.is_active' => 1].`
      * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.

@@ -47,27 +47,21 @@ Setup `AuthComponent`:
         $this->loadComponent('Auth', [
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
-                    'parameter' => 'token',
+                    'storage' => 'Memory'
                     'userModel' => 'Users',
                     'fields' => [
                         'username' => 'id'
                     ],
 
+                    'parameter' => 'token',
+
                     // Boolean indicating whether the "sub" claim of JWT payload
                     // should be used to query the Users model and get user info.
                     // If set to `false` JWT's payload is directly returned.
                     'queryDatasource' => true,
-
-                    // Required for CakePHP 3.1+ for stateless functioning and
-                    // preventing user info being written to session.
-                    'storage' => 'Memory'
                 ]
             ],
             'unauthorizedRedirect' => false,
-
-            // Config below is available since CakePHP 3.1. It makes user info
-            // available in controller's beforeFilter() which is not possible in
-            // CakePHP 3.0.
             'checkAuthIn' => 'Controller.initialize',
         ]);
     }
