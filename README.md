@@ -16,7 +16,7 @@ specification in detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json
 ## Installation
 
 ```sh
-composer require admad/cakephp-jwt-auth:1.0.x-dev
+composer require admad/cakephp-jwt-auth
 ```
 
 ## Usage
@@ -43,7 +43,7 @@ Setup `AuthComponent`:
     public function initialize()
     {
         parent::initialize();
-        
+
         $this->loadComponent('Auth', [
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
@@ -92,7 +92,6 @@ For stateless authentication you need to set the `AuthComponent` "storage" value
 `AuthComponent` performs it's authentication routine for stateless auth *after* your controller's `beforeFilter()` has run. So trying to get user info using `$this->Auth->user()` in `beforeFilter()` will always return `null`.
 
 As of CakPHP 3.1 though you can set a new config option `checkAuthIn` to `Controller.initialize` which makes `AuthComponent` do the authentication routine before controller's `beforeFilter()` is called.
-
 
 ## Further reading
 
