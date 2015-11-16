@@ -47,17 +47,27 @@ Setup `AuthComponent`:
         $this->loadComponent('Auth', [
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
-                    'parameter' => '_token',
+                    'parameter' => 'token',
                     'userModel' => 'Users',
-                    'scope' => ['Users.active' => 1],
                     'fields' => [
-                        'id' => 'id'
-                    ]
+                        'username' => 'id'
+                    ],
+
+                    // Boolean indicating whether the "sub" claim of JWT payload
+                    // should be used to query the Users model and get user info.
+                    // If set to `false` JWT's payload is directly returned.
+                    'queryDatasource' => true,
+
+                    // Required for CakePHP 3.1+ for stateless functioning and
+                    // preventing user info being written to session.
+                    'storage' => 'Memory'
                 ]
             ],
             'unauthorizedRedirect' => false,
-            // Config below is available since CakePHP 3.1.
-            // It makes user info available in controller's beforeFilter() which is not possible in CakePHP 3.0.
+
+            // Config below is available since CakePHP 3.1. It makes user info
+            // available in controller's beforeFilter() which is not possible in
+            // CakePHP 3.0.
             'checkAuthIn' => 'Controller.initialize',
         ]);
     }
@@ -70,30 +80,38 @@ The authentication class checks for the token in two locations:
 - `HTTP_AUTHORIZATION` environment variable:
 
   It first checks if token is passed using `Authorization` request header.
-  The value should be of form `Bearer <token>`.
+  The value should be of form `Bearer <token>`. The `Authorization` header name
+  and token prefix `Bearer` can be customzied using options `header` and `prefix`
+  respectively.
+
+  **Note:** Some servers don't populate `$_SERVER['HTTP_AUTHORIZATION']` when
+  `Authorization` header is set. So it's upto you to ensure that either
+  `$_SERVER['HTTP_AUTHORIZATION']` or `$_ENV['HTTP_AUTHORIZATION']` is set.
+
+  For e.g. for apache you could use the following:
+
+  ```
+  RewriteEngine On
+  RewriteCond %{HTTP:Authorization} ^(.*)
+  RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+  ```
 
 - The query string variable specified using `parameter` config:
 
   Next it checks if the token is present in query string. The default variable
-  name is `_token` and can be customzied by using the `parameter` config shown
+  name is `token` and can be customzied by using the `parameter` config shown
   above.
 
-The payload of the token should either have key `id` or `record`. If
-`id` key exists it's value will be used to query against the primary key field
-of users table.
+The payload should have the "sub" (subject) claim whos value is used to query the
+Users model and find record matching the "id" field.
 
-If `record` key exists it's value will be returned as user record. No check
-will be done against the database.
+You can set the `queryDatasource` option to `false` to directly return the token's
+payload as user info.
 
-## Additional Info
-
-For stateless authentication you need to set the `AuthComponent` "storage" value to be "Memory" otherwise `AuthComponent` will write to session.
-
-`AuthComponent` performs it's authentication routine for stateless auth *after* your controller's `beforeFilter()` has run. So trying to get user info using `$this->Auth->user()` in `beforeFilter()` will always return `null`.
-
-As of CakPHP 3.1 though you can set a new config option `checkAuthIn` to `Controller.initialize` which makes `AuthComponent` do the authentication routine before controller's `beforeFilter()` is called.
-
+You can use `\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
+lib, which this plugin depends on, to generate tokens.
 
 ## Further reading
 
 For an end to end usage example check out [this](http://www.bravo-kernel.com/2015/04/how-to-add-jwt-authentication-to-a-cakephp-3-rest-api/) blog post by Bravo Kernel.
+That tutorial is for v1.0 of this plugin so update code examples accordingly.
