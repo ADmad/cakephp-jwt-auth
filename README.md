@@ -16,7 +16,7 @@ specification in detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json
 ## Installation
 
 ```sh
-composer require admad/cakephp-jwt-auth:1.0.x-dev
+composer require admad/cakephp-jwt-auth:2.0.x-dev
 ```
 
 ## Usage
