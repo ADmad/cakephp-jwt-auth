@@ -121,7 +121,7 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function getUser(Request $request)
     {
-        $payload = $this->payload($request);
+        $payload = $this->getPayload($request);
 
         if (!$this->_config['queryDatasource']) {
             return json_decode(json_encode($payload), true);
@@ -146,7 +146,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * @param \Cake\Network\Request|null $request Request instance or null
      * @return object|null Payload object on success, null on failurec
      */
-    public function payload($request = null)
+    public function getPayload($request = null)
     {
         if (!$request) {
             return $this->_payload;
@@ -154,7 +154,7 @@ class JwtAuthenticate extends BaseAuthenticate
 
         $payload = null;
 
-        $token = $this->token($request);
+        $token = $this->getToken($request);
         if ($token) {
             $payload = $this->_decode($token);
         }
@@ -168,7 +168,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * @param \Cake\Network\Request|null $request Request object.
      * @return string|null Token string if found else null.
      */
-    public function token($request = null)
+    public function getToken($request = null)
     {
         $config = $this->_config;
 
