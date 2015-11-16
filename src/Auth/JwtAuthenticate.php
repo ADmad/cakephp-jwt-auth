@@ -9,7 +9,7 @@ use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 use Exception;
-use JWT;
+use Firebase\JWT\JWT;
 
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
@@ -17,43 +17,70 @@ use JWT;
  * ```
  *  $this->Auth->config('authenticate', [
  *      'ADmad/JwtAuth.Jwt' => [
- *          'parameter' => '_token',
+ *          'parameter' => 'token',
  *          'userModel' => 'Users',
- *          'scope' => ['User.active' => 1]
  *          'fields' => [
- *              'id' => 'id'
+ *              'username' => 'id'
  *          ],
  *      ]
  *  ]);
  * ```
  *
- * @copyright 2014 A. Sarela aka ADmad
+ * @copyright 2015 ADmad
  * @license MIT
  * @see http://jwt.io
  * @see http://tools.ietf.org/html/draft-ietf-oauth-json-web-token
  */
 class JwtAuthenticate extends BaseAuthenticate
 {
+
+    /**
+     * Parsed token
+     *
+     * @var string|null
+     */
+    protected $_token;
+
+    /**
+     * Payload data
+     *
+     * @var object|null
+     */
+    protected $_payload;
+
+    /**
+     * Exception
+     *
+     * @var \Exception
+     */
+    protected $_error;
+
     /**
      * Constructor.
      *
      * Settings for this object.
      *
-     * - `parameter` - The url parameter name of the token. Defaults to `_token`.
+     * - `header` - Header name to check. Defaults to `'authorization'`.
+     * - `prefix` - Token prefix. Defaults to `'bearer'`.
+     * - `parameter` - The url parameter name of the token. Defaults to `token`.
      *   First $_SERVER['HTTP_AUTHORIZATION'] is checked for token value.
      *   Its value should be of form "Bearer <token>". If empty this query string
      *   paramater is checked.
-     * - `userModel` - The model name of the User, defaults to `Users`.
-     * - `fields` - Has key `id` whose value contains primary key field name.
-     *   Defaults to ['id' => 'id'].
+     * - `allowedAlgs` - List of supported verification algorithms.
+     *   Defaults to ['HS256']. See API of JWT::decode() for more info.
+     * - `queryDatasource` - Boolean indicating whether the `sub` claim of JWT
+     *   token should be used to query the user model and get user record. If
+     *   set to `false` JWT's payload is directly retured. Defaults to `true`.
+     * - `userModel` - The model name of users, defaults to `Users`.
+     * - `fields` - Key `username` denotes the identifier field for fetching user
+     *   record. The `sub` claim of JWT must contain identifier value.
+     *   Defaults to ['username' => 'id'].
      * - `scope` - Additional conditions to use when looking up and authenticating
      *   users, i.e. `['Users.is_active' => 1].`
-     * - `contain` - Extra models to contain.
+     * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
      *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
-     * - `allowedAlgs` - List of supported verification algorithms.
-     *   Defaults to ['HS256']. See API of JWT::decode() for more info.
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -62,10 +89,13 @@ class JwtAuthenticate extends BaseAuthenticate
     public function __construct(ComponentRegistry $registry, $config)
     {
         $this->config([
-            'parameter' => '_token',
-            'fields' => ['id' => 'id'],
+            'header' => 'authorization',
+            'prefix' => 'bearer',
+            'parameter' => 'token',
+            'allowedAlgs' => ['HS256'],
+            'queryDatasource' => true,
+            'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
-            'allowedAlgs' => ['HS256']
         ]);
 
         parent::__construct($registry, $config);
@@ -91,95 +121,90 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function getUser(Request $request)
     {
-        $token = $this->_getToken($request);
-        if ($token) {
-            return $this->_findUser($token);
+        $payload = $this->getPayload($request);
+
+        if (!$this->_config['queryDatasource']) {
+            return json_decode(json_encode($payload), true);
         }
 
-        return false;
+        if (!isset($payload->sub)) {
+            return false;
+        }
+
+        $user = $this->_findUser($payload->sub);
+        if (!$user) {
+            return false;
+        }
+
+        unset($user[$this->_config['fields']['password']]);
+        return $user;
+    }
+
+    /**
+     * Get payload data
+     *
+     * @param \Cake\Network\Request|null $request Request instance or null
+     * @return object|null Payload object on success, null on failurec
+     */
+    public function getPayload($request = null)
+    {
+        if (!$request) {
+            return $this->_payload;
+        }
+
+        $payload = null;
+
+        $token = $this->getToken($request);
+        if ($token) {
+            $payload = $this->_decode($token);
+        }
+
+        return $this->_payload = $payload;
     }
 
     /**
      * Get token from header or query string.
      *
-     * @param \Cake\Network\Request $request Request object.
-     * @return string|bool Token string if found else false.
+     * @param \Cake\Network\Request|null $request Request object.
+     * @return string|null Token string if found else null.
      */
-    protected function _getToken($request)
+    public function getToken($request = null)
     {
-        $token = $request->env('HTTP_AUTHORIZATION');
+        $config = $this->_config;
 
-        // @codeCoverageIgnoreStart
-        if (!$token && function_exists('getallheaders')) {
-            $headers = array_change_key_case(getallheaders());
-            if (isset($headers['authorization']) &&
-                substr($headers['authorization'], 0, 7) === 'Bearer '
-            ) {
-                $token = $headers['authorization'];
-            }
-        }
-        // @codeCoverageIgnoreEnd
-
-        if ($token) {
-            return substr($token, 7);
+        if (!$request) {
+            return $this->_token;
         }
 
-        if (!empty($this->_config['parameter']) &&
-            isset($request->query[$this->_config['parameter']])
-        ) {
+        $header = $request->header($config['header']);
+        if ($header) {
+            return $this->_token = str_ireplace($config['prefix'] . ' ', '', $header);
+        }
+
+        if (!empty($this->_config['parameter'])) {
             $token = $request->query($this->_config['parameter']);
         }
 
-        return $token ? $token : false;
+        return $this->_token = $token;
     }
 
     /**
-     * Find a user record.
+     * Decode JWT token.
      *
-     * @param string $token The token identifier.
-     * @param string $password Unused password.
-     * @return bool|array Either false on failure, or an array of user data.
+     * @param string $token JWT token to decode.
+     * @return object|null The JWT's payload as a PHP object, null on failure.
      */
-    protected function _findUser($token, $password = null)
+    protected function _decode($token)
     {
         try {
-            $token = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            return $payload;
         } catch (Exception $e) {
             if (Configure::read('debug')) {
                 throw $e;
             }
-            return false;
+            $this->_error = $e;
         }
-
-        // Token has full user record.
-        if (isset($token->record)) {
-            // Trick to convert object of stdClass to array. Typecasting to
-            // array doesn't convert property values which are themselves objects.
-            return json_decode(json_encode($token->record), true);
-        }
-
-        $fields = $this->_config['fields'];
-
-        $table = TableRegistry::get($this->_config['userModel']);
-        $conditions = [$table->aliasField($fields['id']) => $token->id];
-        if (!empty($this->_config['scope'])) {
-            $conditions = array_merge($conditions, $this->_config['scope']);
-        }
-
-        $query = $table->find('all')
-            ->where($conditions);
-
-        if ($this->_config['contain']) {
-            $query = $query->contain($this->_config['contain']);
-        }
-
-        $result = $query->first();
-        if (empty($result)) {
-            return false;
-        }
-
-        unset($result[$fields['password']]);
-        return $result->toArray();
     }
 
     /**
@@ -199,7 +224,9 @@ class JwtAuthenticate extends BaseAuthenticate
             return;
         }
 
-        $exception = new $this->_config['unauthenticatedException']($this->_registry->Auth->_config['authError']);
+        $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
+
+        $exception = new $this->_config['unauthenticatedException']($message);
         throw $exception;
     }
 }

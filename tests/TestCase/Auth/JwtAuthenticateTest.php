@@ -11,7 +11,7 @@ use Cake\Network\Response;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
-use JWT;
+use Firebase\JWT\JWT;
 
 /**
  * Test case for JwtAuthentication
@@ -39,7 +39,7 @@ class JwtAuthenticateTest extends TestCase
             'userModel' => 'Users'
         ]);
 
-        $this->token = JWT::encode(['id' => 1], Security::salt());
+        $this->token = JWT::encode(['sub' => 1], Security::salt());
 
         $this->response = $this->getMock('Cake\Network\Response');
     }
@@ -64,7 +64,7 @@ class JwtAuthenticateTest extends TestCase
             'created' => new Time('2014-03-17 01:18:23'),
             'updated' => new Time('2014-03-17 01:20:31')
         ];
-        $request = new Request('posts/index?_token=' . $this->token);
+        $request = new Request('posts/index?token=' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
@@ -102,11 +102,11 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test authenticate token with user record
+     * test returning payload without querying database.
      *
      * @return void
      */
-    public function testAuthenticateWithUserRecord()
+    public function testQueryDatasourceFalse()
     {
         $request = new Request('posts/index');
 
@@ -117,8 +117,9 @@ class JwtAuthenticateTest extends TestCase
         ];
         $request->env(
             'HTTP_AUTHORIZATION',
-            'Bearer ' . JWT::encode(['record' => $expected], Security::salt())
+            'Bearer ' . JWT::encode($expected, Security::salt())
         );
+        $this->auth->config('queryDatasource', false);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
     }
