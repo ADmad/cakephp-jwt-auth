@@ -96,7 +96,7 @@ The authentication class checks for the token in two locations:
   name is `token` and can be customzied by using the `parameter` config shown
   above.
 
-## Working
+## Token Generation
 
 You can use `\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
 lib, which this plugin depends on, to generate tokens.
