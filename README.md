@@ -96,14 +96,16 @@ The authentication class checks for the token in two locations:
   name is `token` and can be customzied by using the `parameter` config shown
   above.
 
-The payload should have the "sub" (subject) claim whos value is used to query the
-Users model and find record matching the "id" field.
-
-You can set the `queryDatasource` option to `false` to directly return the token's
-payload as user info.
+## Working
 
 You can use `\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
 lib, which this plugin depends on, to generate tokens.
+
+**The payload should have the "sub" (subject) claim whos value is used to query the
+Users model and find record matching the "id" field.**
+
+You can set the `queryDatasource` option to `false` to directly return the token's
+payload as user info without querying datasource for matching user record.
 
 ## Further reading
 
