@@ -45,9 +45,9 @@ Setup `AuthComponent`:
         parent::initialize();
 
         $this->loadComponent('Auth', [
+            'storage' => 'Memory'
             'authenticate', [
                 'ADmad/JwtAuth.Jwt' => [
-                    'storage' => 'Memory'
                     'userModel' => 'Users',
                     'fields' => [
                         'username' => 'id'
