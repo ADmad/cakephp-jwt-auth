@@ -4,25 +4,23 @@ namespace ADmad\JwtAuth\Test\Fixture;
 use Cake\TestSuite\Fixture\TestFixture;
 
 /**
- * Class GroupsFixture
- *
+ * Class GroupsFixture.
  */
 class GroupsFixture extends TestFixture
 {
-
     /**
-     * fields property
+     * fields property.
      *
      * @var array
      */
     public $fields = [
         'id' => ['type' => 'integer'],
         'title' => ['type' => 'string'],
-        '_constraints' => ['primary' => ['type' => 'primary', 'columns' => ['id']]]
+        '_constraints' => ['primary' => ['type' => 'primary', 'columns' => ['id']]],
     ];
 
     /**
-     * records property
+     * records property.
      *
      * @var array
      */

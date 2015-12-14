@@ -1,7 +1,7 @@
 <?php
 use Cake\Core\Plugin;
 
-/**
+/*
  * Test suite bootstrap
  *
  * This function is used to find the location of CakePHP whether CakePHP
@@ -16,7 +16,7 @@ $findRoot = function ($root) {
             return $root;
         }
     } while ($root !== $lastRoot);
-    throw new Exception("Cannot find the root of the application, unable to run tests");
+    throw new Exception('Cannot find the root of the application, unable to run tests');
 };
 $root = $findRoot(__FILE__);
 unset($findRoot);
