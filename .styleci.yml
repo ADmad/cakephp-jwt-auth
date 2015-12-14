@@ -1,0 +1,10 @@
+enabled:
+  - unalign_double_arrow
+  - concat_with_spaces
+
+disabled:
+  - align_double_arrow
+  - blankline_after_open_tag
+  - concat_without_spaces
+  - phpdoc_align
+  - spaces_cast
