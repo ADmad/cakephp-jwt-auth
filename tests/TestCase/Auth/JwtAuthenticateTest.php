@@ -2,8 +2,6 @@
 namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
 
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
-use Cake\Controller\Component\AuthComponent;
-use Cake\Controller\Controller;
 use Cake\Core\Configure;
 use Cake\I18n\Time;
 use Cake\Network\Request;
@@ -14,7 +12,7 @@ use Cake\Utility\Security;
 use Firebase\JWT\JWT;
 
 /**
- * Test case for JwtAuthentication
+ * Test case for JwtAuthentication.
  */
 class JwtAuthenticateTest extends TestCase
 {
@@ -24,7 +22,7 @@ class JwtAuthenticateTest extends TestCase
     ];
 
     /**
-     * setup
+     * setup.
      *
      * @return void
      */
@@ -36,7 +34,7 @@ class JwtAuthenticateTest extends TestCase
 
         $this->Registry = $this->getMock('Cake\Controller\ComponentRegistry');
         $this->auth = new JwtAuthenticate($this->Registry, [
-            'userModel' => 'Users'
+            'userModel' => 'Users',
         ]);
 
         $this->token = JWT::encode(['sub' => 1], Security::salt());
@@ -45,7 +43,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test authenticate token as query parameter
+     * test authenticate token as query parameter.
      *
      * @return void
      */
@@ -62,7 +60,7 @@ class JwtAuthenticateTest extends TestCase
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
-            'updated' => new Time('2014-03-17 01:20:31')
+            'updated' => new Time('2014-03-17 01:20:31'),
         ];
         $request = new Request('posts/index?token=' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
@@ -75,7 +73,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test authenticate token as request header
+     * test authenticate token as request header.
      *
      * @return void
      */
@@ -89,7 +87,7 @@ class JwtAuthenticateTest extends TestCase
             'user_name' => 'admad',
             'email' => 'admad@example.com',
             'created' => new Time('2014-03-17 01:18:23'),
-            'updated' => new Time('2014-03-17 01:20:31')
+            'updated' => new Time('2014-03-17 01:20:31'),
         ];
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
@@ -113,7 +111,7 @@ class JwtAuthenticateTest extends TestCase
         $expected = [
             'id' => 99,
             'username' => 'ADmad',
-            'group' => ['name' => 'admin']
+            'group' => ['name' => 'admin'],
         ];
         $request->env(
             'HTTP_AUTHORIZATION',
@@ -125,7 +123,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test for valid token but no matching user found in db
+     * test for valid token but no matching user found in db.
      *
      * @return void
      */
@@ -140,7 +138,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * test contain
+     * test contain.
      *
      * @return void
      */
@@ -157,8 +155,8 @@ class JwtAuthenticateTest extends TestCase
             'updated' => new Time('2014-03-17 01:20:31'),
             'group' => [
                 'id' => 1,
-                'title' => 'admin'
-            ]
+                'title' => 'admin',
+            ],
         ];
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
 
@@ -176,7 +174,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * Test that authenticated() always returns false
+     * Test that authenticated() always returns false.
      *
      * @return void
      */
@@ -187,7 +185,7 @@ class JwtAuthenticateTest extends TestCase
 
     /**
      * test that with debug off for invalid token exception from JWT::decode()
-     * is re-thrown
+     * is re-thrown.
      *
      * @expectedException DomainException
      */
@@ -213,7 +211,7 @@ class JwtAuthenticateTest extends TestCase
 
     /**
      * test unauthenticated() doesn't throw exception is config `unauthenticatedException`
-     * is set to falsey value
+     * is set to falsey value.
      */
     public function testUnauthenticatedNoException()
     {
@@ -223,7 +221,7 @@ class JwtAuthenticateTest extends TestCase
 
     /**
      * test that getUser() returns false instead of throwing exception with
-     * invalid token when debug is off
+     * invalid token when debug is off.
      *
      * @return void
      */
