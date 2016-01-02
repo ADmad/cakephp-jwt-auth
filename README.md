@@ -61,6 +61,9 @@ Setup `AuthComponent`:
                     'queryDatasource' => true,
                 ]
             ],
+            // If you don't have a login action in your application, disable it.
+            // Otherwise Auth component will start looking for it
+            'loginAction' => false,
             'unauthorizedRedirect' => false,
             'checkAuthIn' => 'Controller.initialize',
         ]);
