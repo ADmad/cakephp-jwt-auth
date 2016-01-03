@@ -61,8 +61,13 @@ Setup `AuthComponent`:
                     'queryDatasource' => true,
                 ]
             ],
+
             'unauthorizedRedirect' => false,
             'checkAuthIn' => 'Controller.initialize',
+
+            // If you don't have a login action in your application set
+            // 'loginAction' to false to prevent getting a MissingRouteException.
+            'loginAction' => false
         ]);
     }
 ```
