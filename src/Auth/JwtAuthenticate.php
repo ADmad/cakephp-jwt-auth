@@ -174,8 +174,7 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $config = $this->_config;
 
-        if (!$request)
-        {
+        if (!$request) {
             return $this->_token;
         }
 
@@ -201,7 +200,7 @@ class JwtAuthenticate extends BaseAuthenticate
     protected function _decode($token)
     {
         try {
-            $payload = JWT::decode($token, Security::salt(),$this->_config['allowedAlgs']);
+            $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
 
             return $payload;
         } catch (Exception $e) {
