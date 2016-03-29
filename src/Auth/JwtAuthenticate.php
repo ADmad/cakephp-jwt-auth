@@ -92,6 +92,7 @@ class JwtAuthenticate extends BaseAuthenticate
             'allowedAlgs' => ['HS256'],
             'queryDatasource' => true,
             'fields' => ['username' => 'id'],
+            'key' => false,
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
         ]);
 
@@ -200,7 +201,7 @@ class JwtAuthenticate extends BaseAuthenticate
     protected function _decode($token)
     {
         try {
-            $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            $payload = JWT::decode($token, $this->_config['key'] ? $this->_config['key'] : Security::salt(), $this->_config['allowedAlgs']);
 
             return $payload;
         } catch (Exception $e) {
