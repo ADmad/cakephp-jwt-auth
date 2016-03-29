@@ -234,4 +234,26 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }
+
+    /**
+     * test using custom key for decoding jwt.
+     *
+     * @return void
+     */
+    public function testCustomKey()
+    {
+        $key = 'my-custom-key';
+        $auth = new JwtAuthenticate($this->Registry, [
+            'key' => $key,
+            'queryDatasource' => false,
+        ]);
+
+        $payload = ['sub' => 100];
+        $token = Jwt::encode($payload, $key);
+        $request = new Request();
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+
+        $result = $auth->getUser($request, $this->response);
+        $this->assertEquals($payload, $result);
+    }
 }
