@@ -78,6 +78,8 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
      *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
+     * - `key` - The key, or map of keys used to decode JWT. If not set, value
+     *   of Security::salt() will be used.
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -93,6 +95,7 @@ class JwtAuthenticate extends BaseAuthenticate
             'queryDatasource' => true,
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
+            'key' => null,
         ]);
 
         parent::__construct($registry, $config);
@@ -199,8 +202,9 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     protected function _decode($token)
     {
+        $config = $this->_config;
         try {
-            $payload = JWT::decode($token, Security::salt(), $this->_config['allowedAlgs']);
+            $payload = JWT::decode($token, $config['key'] ?: Security::salt(), $config['allowedAlgs']);
 
             return $payload;
         } catch (Exception $e) {
