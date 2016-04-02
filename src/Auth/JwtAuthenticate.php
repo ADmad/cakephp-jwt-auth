@@ -125,6 +125,10 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $payload = $this->getPayload($request);
 
+        if (empty($payload)) {
+            return false;
+        }
+
         if (!$this->_config['queryDatasource']) {
             return json_decode(json_encode($payload), true);
         }
