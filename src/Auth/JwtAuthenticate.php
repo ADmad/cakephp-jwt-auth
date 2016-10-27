@@ -8,6 +8,8 @@ use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\Utility\Security;
 use Exception;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 
 /**
@@ -50,7 +52,7 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Exception.
      *
-     * @var \Exception
+     * @var \Exception|string
      */
     protected $_error;
 
@@ -94,8 +96,7 @@ class JwtAuthenticate extends BaseAuthenticate
             'allowedAlgs' => ['HS256'],
             'queryDatasource' => true,
             'fields' => ['username' => 'id'],
-            'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
-            'key' => null,
+            'key' => null
         ]);
 
         parent::__construct($registry, $config);
@@ -211,11 +212,15 @@ class JwtAuthenticate extends BaseAuthenticate
             $payload = JWT::decode($token, $config['key'] ?: Security::salt(), $config['allowedAlgs']);
 
             return $payload;
+        } catch (ExpiredException $e) {
+            $this->_error = 'The token expired';
+        } catch (BeforeValidException $e) {
+            $this->_error = 'The token is not yet valid';
         } catch (Exception $e) {
             if (Configure::read('debug')) {
-                throw $e;
+                $this->_error = $e;
             }
-            $this->_error = $e;
+            $this->_error = 'The token is invalid';
         }
     }
 
@@ -234,13 +239,22 @@ class JwtAuthenticate extends BaseAuthenticate
      */
     public function unauthenticated(Request $request, Response $response)
     {
-        if (!$this->_config['unauthenticatedException']) {
-            return;
+        if (is_null($this->_error)) {
+            $message = $this->_registry->Auth->_config['authError'];
+        } else if ($this->_error instanceof Exception) {
+            $message = $this->_error->getMessage();
+        } else {
+            $message = $this->_error;
         }
 
-        $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
-
-        $exception = new $this->_config['unauthenticatedException']($message);
-        throw $exception;
+        $response->httpCodes(401);
+        $response->body(json_encode([
+            'error' => 'invalid_token',
+            'error_description' => $message,
+            'url' => $request->here(),
+            'code' => 401
+        ]));
+        $response->type('application/json');
+        $response->send();
     }
 }
