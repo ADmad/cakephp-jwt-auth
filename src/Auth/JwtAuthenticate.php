@@ -8,8 +8,8 @@ use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\Utility\Security;
 use Exception;
-use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
+use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\SignatureInvalidException;
 
@@ -84,7 +84,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `key` - The key, or map of keys used to decode JWT. If not set, value
      *   of Security::salt() will be used.
      * - `default` - Mode "debug". If set to `true`, default exceptions are throwns.
-     *   By default this is disable. (Required for unit tests)
+     *   By default this is enable. (Required for unit tests)
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -101,7 +101,7 @@ class JwtAuthenticate extends BaseAuthenticate
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\ADmad\JwtAuth\Exception\JwtException',
             'key' => null,
-            'debug' => false
+            'debug' => true
         ]);
 
         parent::__construct($registry, $config);

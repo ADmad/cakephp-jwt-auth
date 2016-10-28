@@ -63,7 +63,7 @@ Setup `AuthComponent`:
                     // Boolean indicating use mode "debug". (Required for unit tests)
                     // If set to `true`, default exceptions are throwns.
                     // Requires debug enabled in app.php
-                    // By default this is disable.
+                    // By default this is enable.
                     'debug' => false
                 ]
             ],
