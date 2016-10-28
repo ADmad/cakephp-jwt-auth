@@ -7,8 +7,7 @@ class JwtException extends UnauthorizedException
 {
 
     /**
-     * Identifies the error
-     * @var string
+     * @var string Identifies the error
      */
     protected $_error;
 
