@@ -98,7 +98,12 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $this->expectException('UnexpectedValueException');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('UnexpectedValueException');
+        } else {
+            $this->setExpectedException('UnexpectedValueException');
+        }
+
         $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
@@ -172,7 +177,12 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $this->expectException('UnexpectedValueException');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('UnexpectedValueException');
+        } else {
+            $this->setExpectedException('UnexpectedValueException');
+        }
+
         $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);

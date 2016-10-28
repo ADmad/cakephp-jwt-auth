@@ -8,7 +8,7 @@ class JwtExceptionRenderer extends ExceptionRenderer
 {
 
     /**
-     * @param \ADmad\JwtAuth\Exception\JwtException $exception
+     * @param \ADmad\JwtAuth\Exception\JwtException $exception The exception thrown.
      * @return \Cake\Network\Response The response to be sent.
      */
     public function jwt($exception)
