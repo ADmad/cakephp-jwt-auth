@@ -14,9 +14,9 @@ class JwtException extends UnauthorizedException
 
     /**
      * JwtException constructor.
-     * @param null $message
-     * @param string $error
-     * @param int $code
+     * @param null $message Exception message
+     * @param string $error Error indication
+     * @param int $code HTTP code
      */
     public function __construct($message = null, $error = 'invalid_token', $code = 401)
     {
@@ -32,5 +32,4 @@ class JwtException extends UnauthorizedException
     {
         return $this->_error;
     }
-
 }
