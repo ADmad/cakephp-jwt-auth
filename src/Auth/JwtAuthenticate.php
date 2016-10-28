@@ -8,7 +8,10 @@ use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\Utility\Security;
 use Exception;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\SignatureInvalidException;
 
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
@@ -218,6 +221,7 @@ class JwtAuthenticate extends BaseAuthenticate
             if (Configure::read('debug') && $this->_config['debug'] == true) {
                throw $e;
             }
+
             $this->_error = $e;
         }
     }
@@ -242,8 +246,17 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
+        $error = 'invalid_token';
 
-        $exception = new $this->_config['unauthenticatedException']($message);
+        if ($this->_error instanceof ExpiredException) {
+            $error = 'expired_token';
+        } else if ($this->_error instanceof BeforeValidException) {
+            $error = 'not_yet_valid_token';
+        } else if ($this->_error instanceof SignatureInvalidException) {
+            $error = 'signature_invalid';
+        }
+
+        $exception = new $this->_config['unauthenticatedException']($message, $error);
         throw $exception;
     }
 }
