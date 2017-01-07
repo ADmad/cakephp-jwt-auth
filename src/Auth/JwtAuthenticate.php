@@ -191,10 +191,10 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         if (!empty($this->_config['parameter'])) {
-            $token = $request->query($this->_config['parameter']);
+            $this->_token = $request->query($this->_config['parameter']);
         }
 
-        return $this->_token = $token;
+        return $this->_token;
     }
 
     /**

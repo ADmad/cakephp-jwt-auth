@@ -100,6 +100,24 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
+     * test authenticate no token present in header "parameter" option disabled.
+     *
+     * @return void
+     */
+    public function testAuthenticateNoHeaderWithParameterDisabled()
+    {
+        $request = new Request('posts/index');
+
+        $this->auth = new JwtAuthenticate($this->Registry, [
+            'userModel' => 'Users',
+            'parameter' => false
+        ]);
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+    }
+
+    /**
      * test returning payload without querying database.
      *
      * @return void
