@@ -84,7 +84,7 @@ The authentication class checks for the token in two locations:
   respectively.
 
   **Note:** Some servers don't populate `$_SERVER['HTTP_AUTHORIZATION']` when
-  `Authorization` header is set. So it's upto you to ensure that either
+  `Authorization` header is set. So it's up to you to ensure that either
   `$_SERVER['HTTP_AUTHORIZATION']` or `$_ENV['HTTP_AUTHORIZATION']` is set.
 
   For e.g. for apache you could use the following:
