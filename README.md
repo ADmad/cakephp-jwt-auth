@@ -25,7 +25,7 @@ In your app's `config/bootstrap.php` add:
 
 ```php
 // In config/bootstrap.php
-Plugin::load('ADmad/JwtAuth');
+Plugin::load('ADmad/JwtAuth', ['bootstrap' => true]);
 ```
 
 or using cake's console:
@@ -59,6 +59,12 @@ Setup `AuthComponent`:
                     // should be used to query the Users model and get user info.
                     // If set to `false` JWT's payload is directly returned.
                     'queryDatasource' => true,
+                    
+                    // Boolean indicating use mode "debug". (Required for unit tests)
+                    // If set to `true`, default exceptions are throwns.
+                    // Requires debug enabled in app.php
+                    // By default this is enable.
+                    'debug' => false
                 ]
             ],
 

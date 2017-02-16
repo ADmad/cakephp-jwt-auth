@@ -1,5 +1,5 @@
 <?php
-namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
+namespace ADmad\JwtAuth\Test\TestCase\Auth;
 
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
 use Cake\Core\Configure;
@@ -32,14 +32,19 @@ class JwtAuthenticateTest extends TestCase
 
         Security::salt('secret-key');
 
-        $this->Registry = $this->getMock('Cake\Controller\ComponentRegistry');
+        if (method_exists($this, 'createMock')) {
+            $this->Registry = $this->createMock('Cake\Controller\ComponentRegistry');
+            $this->response = $this->createMock('Cake\Network\Response');
+        } else {
+            $this->Registry = $this->getMock('Cake\Controller\ComponentRegistry');
+            $this->response = $this->getMock('Cake\Network\Response');
+        }
+
         $this->auth = new JwtAuthenticate($this->Registry, [
             'userModel' => 'Users',
         ]);
 
         $this->token = JWT::encode(['sub' => 1], Security::salt());
-
-        $this->response = $this->getMock('Cake\Network\Response');
     }
 
     /**
@@ -93,7 +98,12 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $this->setExpectedException('UnexpectedValueException');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('UnexpectedValueException');
+        } else {
+            $this->setExpectedException('UnexpectedValueException');
+        }
+
         $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
@@ -185,7 +195,12 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $this->setExpectedException('UnexpectedValueException');
+        if (method_exists($this, 'expectException')) {
+            $this->expectException('UnexpectedValueException');
+        } else {
+            $this->setExpectedException('UnexpectedValueException');
+        }
+
         $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
@@ -216,7 +231,7 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * @expectedException Cake\Network\Exception\UnauthorizedException
+     * @expectedException \ADmad\JwtAuth\Exception\JwtException
      * @expectedExceptionMessage Auth error
      */
     public function testUnauthenticated()

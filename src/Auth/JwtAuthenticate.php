@@ -8,7 +8,10 @@ use Cake\Network\Request;
 use Cake\Network\Response;
 use Cake\Utility\Security;
 use Exception;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\SignatureInvalidException;
 
 /**
  * An authentication adapter for authenticating using JSON Web Tokens.
@@ -77,9 +80,11 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
-     *   Defaults to '\Cake\Network\Exception\UnauthorizedException'.
+     *   Defaults to '\ADmad\JwtAuth\Exception\JwtException'.
      * - `key` - The key, or map of keys used to decode JWT. If not set, value
      *   of Security::salt() will be used.
+     * - `default` - Mode "debug". If set to `true`, default exceptions are throwns.
+     *   By default this is enable. (Required for unit tests)
      *
      * @param \Cake\Controller\ComponentRegistry $registry The Component registry
      *   used on this request.
@@ -94,8 +99,9 @@ class JwtAuthenticate extends BaseAuthenticate
             'allowedAlgs' => ['HS256'],
             'queryDatasource' => true,
             'fields' => ['username' => 'id'],
-            'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
+            'unauthenticatedException' => '\ADmad\JwtAuth\Exception\JwtException',
             'key' => null,
+            'debug' => true
         ]);
 
         parent::__construct($registry, $config);
@@ -212,9 +218,10 @@ class JwtAuthenticate extends BaseAuthenticate
 
             return $payload;
         } catch (Exception $e) {
-            if (Configure::read('debug')) {
+            if (Configure::read('debug') && $this->_config['debug'] == true) {
                 throw $e;
             }
+
             $this->_error = $e;
         }
     }
@@ -227,7 +234,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * @param \Cake\Network\Request $request A request object.
      * @param \Cake\Network\Response $response A response object.
      *
-     * @throws \Cake\Network\Exception\UnauthorizedException Or any other
+     * @throws \ADmad\JwtAuth\Exception\JwtException Or any other
      *   configured exception.
      *
      * @return void
@@ -239,8 +246,17 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
+        $error = 'invalid_token';
 
-        $exception = new $this->_config['unauthenticatedException']($message);
+        if ($this->_error instanceof ExpiredException) {
+            $error = 'expired_token';
+        } elseif ($this->_error instanceof BeforeValidException) {
+            $error = 'not_yet_valid_token';
+        } elseif ($this->_error instanceof SignatureInvalidException) {
+            $error = 'signature_invalid';
+        }
+
+        $exception = new $this->_config['unauthenticatedException']($message, $error);
         throw $exception;
     }
 }
