@@ -32,14 +32,16 @@ class JwtAuthenticateTest extends TestCase
 
         Security::salt('secret-key');
 
-        $this->Registry = $this->getMock('Cake\Controller\ComponentRegistry');
+        $this->Registry = $this->getMockBuilder('Cake\Controller\ComponentRegistry')
+            ->getMock();
         $this->auth = new JwtAuthenticate($this->Registry, [
             'userModel' => 'Users',
         ]);
 
         $this->token = JWT::encode(['sub' => 1], Security::salt());
 
-        $this->response = $this->getMock('Cake\Network\Response');
+        $this->response = $this->getMockBuilder('Cake\Network\Response')
+            ->getMock();
     }
 
     /**
