@@ -83,7 +83,14 @@ The authentication class checks for the token in two locations:
   and token prefix `Bearer` can be customzied using options `header` and `prefix`
   respectively.
 
-  **Note:** Some servers don't populate `$_SERVER['HTTP_AUTHORIZATION']` when
+- The query string variable specified using `parameter` config:
+
+  Next it checks if the token is present in query string. The default variable
+  name is `token` and can be customzied by using the `parameter` config shown
+  above.
+
+### Known Issue
+  Some servers don't populate `$_SERVER['HTTP_AUTHORIZATION']` when
   `Authorization` header is set. So it's up to you to ensure that either
   `$_SERVER['HTTP_AUTHORIZATION']` or `$_ENV['HTTP_AUTHORIZATION']` is set.
 
@@ -94,13 +101,7 @@ The authentication class checks for the token in two locations:
   RewriteCond %{HTTP:Authorization} ^(.*)
   RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
   ```
-
-- The query string variable specified using `parameter` config:
-
-  Next it checks if the token is present in query string. The default variable
-  name is `token` and can be customzied by using the `parameter` config shown
-  above.
-
+  
 ## Token Generation
 
 You can use `\Firebase\JWT\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
