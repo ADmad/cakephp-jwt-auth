@@ -185,7 +185,7 @@ class JwtAuthenticate extends BaseAuthenticate
             return $this->_token;
         }
 
-        $header = $request->header($config['header']);
+        $header = apache_request_headers()[$config['header']];
         if ($header) {
             return $this->_token = str_ireplace($config['prefix'] . ' ', '', $header);
         }
