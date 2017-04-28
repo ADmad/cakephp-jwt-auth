@@ -91,13 +91,16 @@ class JwtAuthenticate extends BaseAuthenticate
             'header' => 'authorization',
             'prefix' => 'bearer',
             'parameter' => 'token',
-            'allowedAlgs' => ['HS256'],
             'queryDatasource' => true,
             'fields' => ['username' => 'id'],
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
             'key' => null,
         ]);
-
+        if(!array_key_exists('allowedAlgs',$config) || empty($config['allowedAlgs']) {
+            $this->config([
+                'allowedAlgs' => ['HS256'],
+            ]);
+        }
         parent::__construct($registry, $config);
     }
 
