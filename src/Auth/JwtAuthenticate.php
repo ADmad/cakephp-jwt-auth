@@ -96,11 +96,13 @@ class JwtAuthenticate extends BaseAuthenticate
             'unauthenticatedException' => '\Cake\Network\Exception\UnauthorizedException',
             'key' => null,
         ]);
-        if(!array_key_exists('allowedAlgs',$config) || empty($config['allowedAlgs']) {
+
+        if (!array_key_exists('allowedAlgs', $config) || empty($config['allowedAlgs']) {
             $this->config([
                 'allowedAlgs' => ['HS256'],
             ]);
         }
+
         parent::__construct($registry, $config);
     }
 
