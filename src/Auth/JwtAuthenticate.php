@@ -186,7 +186,7 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         $header = $request->header($config['header']);
-        if ($header) {
+        if ($header && stripos($header, $config['prefix']) === 0) {
             return $this->_token = str_ireplace($config['prefix'] . ' ', '', $header);
         }
 
