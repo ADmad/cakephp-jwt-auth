@@ -215,9 +215,6 @@ class JwtAuthenticate extends BaseAuthenticate
 
             return $payload;
         } catch (Exception $e) {
-            if (Configure::read('debug')) {
-                throw $e;
-            }
             $this->_error = $e;
         }
     }
