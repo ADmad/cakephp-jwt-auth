@@ -276,4 +276,24 @@ class JwtAuthenticateTest extends TestCase
         $result = $auth->getUser($request, $this->response);
         $this->assertEquals($payload, $result);
     }
+
+    /**
+     * test if allowedAlgs gets overwritten, not merged with default config.
+     *
+     * @expectedException InvalidArgumentException
+     */
+    public function testOverwriteAlgs()
+    {
+        $key = 'my-custom-key';
+        $auth = new JwtAuthenticate($this->Registry, [
+            'allowedAlgs' => 'RS256',
+        ]);
+
+        $payload = ['sub' => 100];
+        $token = Jwt::encode($payload, $key);
+        $request = new Request();
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+
+        $result = $auth->getUser($request, $this->response);
+    }
 }
