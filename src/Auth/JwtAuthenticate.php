@@ -103,6 +103,12 @@ class JwtAuthenticate extends BaseAuthenticate
 
         $this->config($defaults);
 
+        if (!array_key_exists('allowedAlgs', $config) || empty($config['allowedAlgs'])) {
+            $this->config([
+                'allowedAlgs' => ['HS256'],
+            ]);
+        }
+
         parent::__construct($registry, $config);
     }
 
