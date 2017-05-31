@@ -72,6 +72,10 @@ class JwtAuthenticateTest extends TestCase
         $request = new Request('posts/index?tokenname=' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
+
+        $request = new Request('posts/index?wrongtoken=' . $this->token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
     }
 
     /**
@@ -95,6 +99,10 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
+        $request->env('HTTP_AUTHORIZATION', 'WrongBearer ' . $this->token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+
         $this->setExpectedException('UnexpectedValueException');
         $request->env('HTTP_AUTHORIZATION', 'Bearer foobar');
         $result = $this->auth->getUser($request, $this->response);
@@ -117,6 +125,10 @@ class JwtAuthenticateTest extends TestCase
 
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
+
+        $request = new Request('posts/index?token=' . $this->token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
     }
 
     /**
@@ -126,18 +138,20 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testQueryDatasourceFalse()
     {
-        $request = new Request('posts/index');
-
         $expected = [
-            'id' => 99,
-            'username' => 'ADmad',
-            'group' => ['name' => 'admin'],
+                'id' => 99,
+                'username' => 'ADmad',
+                'group' => ['name' => 'admin'],
         ];
-        $request->env(
-            'HTTP_AUTHORIZATION',
-            'Bearer ' . JWT::encode($expected, Security::salt())
-        );
+        $token = JWT::encode($expected, Security::salt());
         $this->auth->config('queryDatasource', false);
+
+        $request = new Request('posts/index');
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertEquals($expected, $result);
+
+        $request = new Request('posts/index?token=' . $token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
     }
@@ -149,10 +163,14 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testWithValidTokenButNoUserInDb()
     {
-        $request = new Request('posts/index');
-
         $token = JWT::encode(['id' => 4], Security::salt());
+
+        $request = new Request('posts/index');
         $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+
+        $request = new Request('posts/index?token=' . $token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }
@@ -270,9 +288,13 @@ class JwtAuthenticateTest extends TestCase
 
         $payload = ['sub' => 100];
         $token = Jwt::encode($payload, $key);
-        $request = new Request();
-        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
 
+        $request = new Request('posts/index');
+        $request->env('HTTP_AUTHORIZATION', 'Bearer ' . $token);
+        $result = $auth->getUser($request, $this->response);
+        $this->assertEquals($payload, $result);
+
+        $request = new Request('posts/index?token=' . $token);
         $result = $auth->getUser($request, $this->response);
         $this->assertEquals($payload, $result);
     }
