@@ -45,6 +45,20 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
+     * testConfig.
+     *
+     * @return void
+     */
+    public function testConfig()
+    {
+        $auth = new JwtAuthenticate($this->Registry, [
+            'allowedAlgs' => ['RS256']
+        ]);
+
+        $this->assertEquals(['RS256'], $auth->config('allowedAlgs'));
+    }
+
+    /**
      * test authenticate token as query parameter.
      *
      * @return void
