@@ -113,6 +113,32 @@ Users model and find record matching the "id" field.**
 You can set the `queryDatasource` option to `false` to directly return the token's
 payload as user info without querying datasource for matching user record.
 
+## Token example
+
+This method is an example about how to create the `access_token` request:
+
+```php
+    public function access_token()
+    {
+        $user = $this->Auth->identify();
+        if (!$user) {
+            throw new UnauthorizedException('Invalid username or password');
+        }
+
+        $this->set('data', [
+            'user' => $user,
+            'token' => $token = JWT::encode([
+                'id' => $user['id'],
+                'sub' => $user['id'],
+                'user' => $user,
+                'exp' => time() + 604800
+            ],
+                Security::salt())
+        ]);
+        $this->set('_serialize', 'data');
+    }
+```
+
 ## Further reading
 
 For an end to end usage example check out [this](http://www.bravo-kernel.com/2015/04/how-to-add-jwt-authentication-to-a-cakephp-3-rest-api/) blog post by Bravo Kernel.
