@@ -280,13 +280,13 @@ class JwtAuthenticateTest extends TestCase
     /**
      * test if allowedAlgs gets overwritten, not merged with default config.
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException UnexpectedValueException
      */
     public function testOverwriteAlgs()
     {
         $key = 'my-custom-key';
         $auth = new JwtAuthenticate($this->Registry, [
-            'allowedAlgs' => 'RS256',
+            'allowedAlgs' => ['RS256'],
         ]);
 
         $payload = ['sub' => 100];
