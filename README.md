@@ -80,7 +80,7 @@ The authentication class checks for the token in two locations:
 
   It first checks if token is passed using `Authorization` request header.
   The value should be of form `Bearer <token>`. The `Authorization` header name
-  and token prefix `Bearer` can be customzied using options `header` and `prefix`
+  and token prefix `Bearer` can be customized using options `header` and `prefix`
   respectively.
 
 - The query string variable specified using `parameter` config:
