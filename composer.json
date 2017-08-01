@@ -22,8 +22,8 @@
         "issues":"https://github.com/ADmad/cakephp-jwt-auth/issues"
     },
     "require": {
-        "cakephp/cakephp": "~3.1",
-        "firebase/php-jwt": "~4.0"
+        "cakephp/cakephp": "^3.1",
+        "firebase/php-jwt": "^5.0"
     },
     "require-dev": {
         "phpunit/phpunit": "<6.0"
