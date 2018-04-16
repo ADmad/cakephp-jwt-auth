@@ -9,10 +9,6 @@ Plugin containing AuthComponent's authenticate class for authenticating using
 [JSON Web Tokens](http://jwt.io/). You can read about JSON Web Token
 specification in detail [here](https://tools.ietf.org/html/draft-ietf-oauth-json-web-token-27).
 
-## Requirements
-
-* CakePHP 3.1+
-
 ## Installation
 
 ```sh
@@ -101,7 +97,7 @@ The authentication class checks for the token in two locations:
   RewriteCond %{HTTP:Authorization} ^(.*)
   RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
   ```
-  
+
 ## Token Generation
 
 You can use `\Firebase\JWT\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
