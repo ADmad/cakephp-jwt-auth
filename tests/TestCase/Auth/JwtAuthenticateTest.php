@@ -4,6 +4,7 @@ namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
 use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
+use Cake\Http\Exception\UnauthorizedException;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
 use Cake\I18n\Time;
@@ -253,12 +254,17 @@ class JwtAuthenticateTest extends TestCase
     }
 
     /**
-     * @expectedException Cake\Http\Exception\UnauthorizedException
-     * @expectedExceptionMessage Auth error
+     * testUnauthenticated
      */
     public function testUnauthenticated()
     {
         $this->Registry->Auth->setConfig('authError', 'Auth error');
+
+        if (!class_exists(UnauthorizedException::class)) {
+            $exceptionClass = 'Cake\Network\Exception\UnauthorizedException';
+        }
+        $this->expectException($exceptionClass);
+        $this->expectExceptionMessage('Auth error');
 
         $result = $this->auth->unauthenticated(new ServerRequest(), $this->response);
     }
