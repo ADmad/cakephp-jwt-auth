@@ -183,7 +183,7 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Get token from header or query string.
      *
-     * @param \Cake\Network\Request|null $request Request object.
+     * @param \Cake\Http\ServerRequest|null $request Request object.
      *
      * @return string|null Token string if found else null.
      */
@@ -191,7 +191,7 @@ class JwtAuthenticate extends BaseAuthenticate
     {
         $config = $this->_config;
 
-        if (!$request) {
+        if ($request === null) {
             return $this->_token;
         }
 
@@ -201,7 +201,10 @@ class JwtAuthenticate extends BaseAuthenticate
         }
 
         if (!empty($this->_config['parameter'])) {
-            $this->_token = $request->getQuery($this->_config['parameter']);
+            $token = $request->getQuery($this->_config['parameter']);
+            if ($token !== null) {
+                $token = (string)$token;
+            }
         }
 
         return $this->_token;
@@ -252,7 +255,9 @@ class JwtAuthenticate extends BaseAuthenticate
             return;
         }
 
-        $message = $this->_error ? $this->_error->getMessage() : $this->_registry->Auth->_config['authError'];
+        $message = $this->_error
+            ? $this->_error->getMessage()
+            : $this->_registry->get('Auth')->getConfig('authError');
 
         $exception = new $this->_config['unauthenticatedException']($message);
         throw $exception;
