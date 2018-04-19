@@ -260,6 +260,7 @@ class JwtAuthenticateTest extends TestCase
     {
         $this->Registry->Auth->setConfig('authError', 'Auth error');
 
+        $exceptionClass = UnauthorizedException::class;
         if (!class_exists(UnauthorizedException::class)) {
             $exceptionClass = 'Cake\Network\Exception\UnauthorizedException';
         }
