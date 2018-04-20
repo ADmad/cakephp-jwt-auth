@@ -205,6 +205,8 @@ class JwtAuthenticate extends BaseAuthenticate
             if ($token !== null) {
                 $token = (string)$token;
             }
+
+            return $this->_token = $token;
         }
 
         return $this->_token;
