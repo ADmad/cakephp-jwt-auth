@@ -60,7 +60,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * Settings for this object.
      *
-     * - `cookie` - Cookie name to check. Defaults to `'jwt'`.
+     * - `cookie` - Cookie name to check. Defaults to `false`.
      * - `header` - Header name to check. Defaults to `'authorization'`.
      * - `prefix` - Token prefix. Defaults to `'bearer'`.
      * - `parameter` - The url parameter name of the token. Defaults to `token`.
@@ -90,7 +90,7 @@ class JwtAuthenticate extends BaseAuthenticate
     public function __construct(ComponentRegistry $registry, $config)
     {
         $defaultConfig = [
-            'cookie' => 'jwt',
+            'cookie' => false,
             'header' => 'authorization',
             'prefix' => 'bearer',
             'parameter' => 'token',
