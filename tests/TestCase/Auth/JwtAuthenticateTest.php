@@ -322,7 +322,6 @@ class JwtAuthenticateTest extends TestCase
         $this->assertEquals($payload, $result);
     }
 
-
     /**
      * test authenticate token as cookie.
      *
