@@ -321,4 +321,56 @@ class JwtAuthenticateTest extends TestCase
         $result = $auth->getUser($request, $this->response);
         $this->assertEquals($payload, $result);
     }
+
+    /**
+     * test authenticate token as cookie.
+     *
+     * @return void
+     */
+    public function testAuthenticateCookie()
+    {
+        $request = new ServerRequest('posts/index');
+
+        $this->auth = new JwtAuthenticate($this->Registry, [
+            'userModel' => 'Users',
+            'cookie' => 'jwt',
+        ]);
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+
+        $expected = [
+            'id' => 1,
+            'group_id' => 1,
+            'user_name' => 'admad',
+            'email' => 'admad@example.com',
+            'created' => new Time('2014-03-17 01:18:23'),
+            'updated' => new Time('2014-03-17 01:20:31'),
+        ];
+
+        $request = new ServerRequest([
+            'url' => 'posts/index',
+            'cookies' => ['jwt' => $this->token]
+        ]);
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertEquals($expected, $result);
+
+        $this->auth->setConfig('cookie', 'tokenname');
+        $request = new ServerRequest([
+            'url' => 'posts/index',
+            'cookies' => ['tokenname' => $this->token]
+        ]);
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertEquals($expected, $result);
+
+        $request = new ServerRequest([
+            'url' => 'posts/index',
+            'cookies' => ['wrongtoken' => $this->token]
+        ]);
+
+        $result = $this->auth->getUser($request, $this->response);
+        $this->assertFalse($result);
+    }
 }
