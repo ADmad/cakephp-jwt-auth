@@ -201,13 +201,13 @@ class JwtAuthenticate extends BaseAuthenticate
         if ($header && stripos($header, $config['prefix']) === 0) {
             return $this->_token = str_ireplace($config['prefix'] . ' ', '', $header);
         }
-        
-        if (!empty($this->_config['cookie'])){
+
+        if (!empty($this->_config['cookie'])) {
             $token = $request->getCookie($this->_config['cookie']);
             if ($token !== null) {
                 $token = (string)$token;
             }
-            
+
             return $this->_token = $token;
         }
 
