@@ -79,7 +79,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * - `finder` - Finder method.
      * - `unauthenticatedException` - Fully namespaced exception name. Exception to
      *   throw if authentication fails. Set to false to do nothing.
-     *   Defaults to '\Cake\Htttp\Exception\UnauthorizedException'.
+     *   Defaults to '\Cake\Http\Exception\UnauthorizedException'.
      * - `key` - The key, or map of keys used to decode JWT. If not set, value
      *   of Security::salt() will be used.
      *
