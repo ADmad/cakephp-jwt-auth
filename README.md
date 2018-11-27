@@ -103,7 +103,7 @@ The authentication class checks for the token in two locations:
 You can use `\Firebase\JWT\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
 lib, which this plugin depends on, to generate tokens.
 
-**The payload should have the "sub" (subject) claim whos value is used to query the
+**The payload should have the "sub" (subject) claim whose value is used to query the
 Users model and find record matching the "id" field.**
 
 You can set the `queryDatasource` option to `false` to directly return the token's
