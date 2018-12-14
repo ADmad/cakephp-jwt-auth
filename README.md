@@ -97,6 +97,12 @@ The authentication class checks for the token in two locations:
   RewriteCond %{HTTP:Authorization} ^(.*)
   RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
   ```
+  
+  or
+  
+  ```
+  SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+  ```
 
 ## Token Generation
 
