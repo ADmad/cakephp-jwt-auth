@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ADmad\JwtAuth\Auth;
 
 use Cake\Auth\BaseAuthenticate;
@@ -26,7 +28,7 @@ use Firebase\JWT\JWT;
  *  ]);
  * ```
  *
- * @copyright 2015-2018 ADmad
+ * @copyright 2015-Present ADmad
  * @license MIT
  *
  * @see http://jwt.io
@@ -87,7 +89,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *   used on this request.
      * @param array $config Array of config to use.
      */
-    public function __construct(ComponentRegistry $registry, $config)
+    public function __construct(ComponentRegistry $registry, array $config)
     {
         $defaultConfig = [
             'cookie' => false,
@@ -99,10 +101,6 @@ class JwtAuthenticate extends BaseAuthenticate
             'unauthenticatedException' => UnauthorizedException::class,
             'key' => null,
         ];
-
-        if (!class_exists(UnauthorizedException::class)) {
-            $defaultConfig['unauthenticatedException'] = 'Cake\Network\Exception\UnauthorizedException';
-        }
 
         $this->setConfig($defaultConfig);
 
@@ -149,7 +147,7 @@ class JwtAuthenticate extends BaseAuthenticate
             return false;
         }
 
-        $user = $this->_findUser($payload->sub);
+        $user = $this->_findUser((string)$payload->sub);
         if (!$user) {
             return false;
         }
@@ -166,7 +164,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @return object|null Payload object on success, null on failurec
      */
-    public function getPayload($request = null)
+    public function getPayload(?ServerRequest $request = null)
     {
         if (!$request) {
             return $this->_payload;
@@ -189,7 +187,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @return string|null Token string if found else null.
      */
-    public function getToken($request = null)
+    public function getToken(?ServerRequest $request = null)
     {
         $config = $this->_config;
 
@@ -230,7 +228,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @return object|null The JWT's payload as a PHP object, null on failure.
      */
-    protected function _decode($token)
+    protected function _decode(string $token)
     {
         $config = $this->_config;
         try {
@@ -247,6 +245,8 @@ class JwtAuthenticate extends BaseAuthenticate
             }
             $this->_error = $e;
         }
+
+        return null;
     }
 
     /**
