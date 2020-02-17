@@ -22,12 +22,11 @@
         "issues":"https://github.com/ADmad/cakephp-jwt-auth/issues"
     },
     "require": {
-        "cakephp/cakephp": "^3.5",
+        "cakephp/cakephp": "^4.0",
         "firebase/php-jwt": "^5.0"
     },
     "require-dev": {
-        "cakephp/chronos": "^1.1",
-        "phpunit/phpunit": "^5.7.14|^6.0"
+        "phpunit/phpunit": "~8.5.0"
     },
     "autoload": {
         "psr-4": {
