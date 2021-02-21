@@ -1,8 +1,5 @@
 parameters:
-    level: 6
-    checkMissingIterableValueType: false
-    ignoreErrors:
-        -
-            message: "#^Ternary operator condition is always true\\.$#"
-            count: 1
-            path: src/Auth/JwtAuthenticate.php
+	level: 6
+	checkMissingIterableValueType: false
+	paths:
+		- src/

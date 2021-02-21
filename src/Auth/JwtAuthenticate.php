@@ -52,7 +52,7 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Exception.
      *
-     * @var \Exception
+     * @var \Throwable|null
      */
     protected $_error;
 
@@ -115,7 +115,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @param \Cake\Http\ServerRequest $request The request object.
      * @param \Cake\Http\Response $response Response object.
-     * @return bool|array User record array or false on failure.
+     * @return false|array User record array or false on failure.
      */
     public function authenticate(ServerRequest $request, Response $response)
     {
@@ -126,7 +126,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get user record based on info available in JWT.
      *
      * @param \Cake\Http\ServerRequest $request Request object.
-     * @return bool|array User record array or false on failure.
+     * @return false|array User record array or false on failure.
      */
     public function getUser(ServerRequest $request)
     {
@@ -198,6 +198,7 @@ class JwtAuthenticate extends BaseAuthenticate
         if (!empty($this->_config['cookie'])) {
             $token = $request->getCookie($this->_config['cookie']);
             if ($token !== null) {
+                /** @psalm-suppress PossiblyInvalidCast */
                 $token = (string)$token;
             }
 
@@ -207,6 +208,7 @@ class JwtAuthenticate extends BaseAuthenticate
         if (!empty($this->_config['parameter'])) {
             $token = $request->getQuery($this->_config['parameter']);
             if ($token !== null) {
+                /** @psalm-suppress PossiblyInvalidCast */
                 $token = (string)$token;
             }
 
@@ -264,6 +266,7 @@ class JwtAuthenticate extends BaseAuthenticate
             ? $this->_error->getMessage()
             : $this->_registry->get('Auth')->getConfig('authError');
 
+        /** @var \Throwable $exception */
         $exception = new $this->_config['unauthenticatedException']($message);
         throw $exception;
     }
