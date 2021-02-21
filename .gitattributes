@@ -7,3 +7,4 @@ phpunit.xml export-ignore
 tests export-ignore
 .phpstan.neon export-ignore
 .psalm.xml export-ignore
+.github export-ignore
