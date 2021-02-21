@@ -21,7 +21,7 @@ use Firebase\JWT\JWT;
  */
 class JwtAuthenticateTest extends TestCase
 {
-    public $fixtures = [
+    protected $fixtures = [
         'plugin.ADmad\JwtAuth.Users',
         'plugin.ADmad\JwtAuth.Groups',
     ];
@@ -234,7 +234,7 @@ class JwtAuthenticateTest extends TestCase
         $this->expectException($exceptionClass);
         $this->expectExceptionMessage('Auth error');
 
-        $result = $this->auth->unauthenticated(new ServerRequest(), $this->response);
+        $this->auth->unauthenticated(new ServerRequest(), $this->response);
     }
 
     /**
@@ -277,7 +277,7 @@ class JwtAuthenticateTest extends TestCase
         ]);
 
         $payload = ['sub' => 100];
-        $token = Jwt::encode($payload, $key);
+        $token = JWT::encode($payload, $key);
 
         $request = new ServerRequest();
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $token);

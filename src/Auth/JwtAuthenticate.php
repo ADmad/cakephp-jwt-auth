@@ -30,7 +30,6 @@ use Firebase\JWT\JWT;
  *
  * @copyright 2015-Present ADmad
  * @license MIT
- *
  * @see http://jwt.io
  * @see http://tools.ietf.org/html/draft-ietf-oauth-json-web-token
  */
@@ -116,7 +115,6 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @param \Cake\Http\ServerRequest $request The request object.
      * @param \Cake\Http\Response $response Response object.
-     *
      * @return bool|array User record array or false on failure.
      */
     public function authenticate(ServerRequest $request, Response $response)
@@ -128,7 +126,6 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get user record based on info available in JWT.
      *
      * @param \Cake\Http\ServerRequest $request Request object.
-     *
      * @return bool|array User record array or false on failure.
      */
     public function getUser(ServerRequest $request)
@@ -161,7 +158,6 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get payload data.
      *
      * @param \Cake\Http\ServerRequest|null $request Request instance or null
-     *
      * @return object|null Payload object on success, null on failurec
      */
     public function getPayload(?ServerRequest $request = null)
@@ -184,7 +180,6 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get token from header or query string.
      *
      * @param \Cake\Http\ServerRequest|null $request Request object.
-     *
      * @return string|null Token string if found else null.
      */
     public function getToken(?ServerRequest $request = null)
@@ -225,7 +220,6 @@ class JwtAuthenticate extends BaseAuthenticate
      * Decode JWT token.
      *
      * @param string $token JWT token to decode.
-     *
      * @return object|null The JWT's payload as a PHP object, null on failure.
      */
     protected function _decode(string $token)
@@ -256,10 +250,8 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @param \Cake\Http\ServerRequest $request A request object.
      * @param \Cake\Http\Response $response A response object.
-     *
      * @throws \Cake\Http\Exception\UnauthorizedException Or any other
      *   configured exception.
-     *
      * @return void
      */
     public function unauthenticated(ServerRequest $request, Response $response)
