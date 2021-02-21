@@ -1,0 +1,74 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  testsuite:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['7.4', '8.0']
+        composer-opts: ['']
+        include:
+          - php-version: '7.2'
+            composer-opts: '--prefer-lowest'
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extension-csv: mbstring, intl
+        coverage: pcov
+
+    - name: Composer install
+      run: |
+        composer update ${{ matrix.composer-opts }}
+
+    - name: Run PHPUnit
+      run: |
+        if [[ ${{ matrix.php-version }} == '7.4' ]]; then
+          vendor/bin/phpunit --coverage-clover=coverage.xml
+        else
+          vendor/bin/phpunit
+        fi
+
+    - name: Code Coverage Report
+      if: matrix.php-version == '7.4'
+      uses: codecov/codecov-action@v1
+
+  cs-stan:
+      name: Coding Standard & Static Analysis
+      runs-on: ubuntu-18.04
+
+      steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extension-csv: mbstring, intl
+          coverage: none
+          tools: cs2pr, psalm, phpstan
+
+      - name: Composer Install
+        run: composer require cakephp/cakephp-codesniffer:^4.1
+
+      - name: Run phpcs
+        run: vendor/bin/phpcs --report=checkstyle -q --standard=vendor/cakephp/cakephp-codesniffer/CakePHP src/ tests/ | cs2pr
+
+      - name: Run psalm
+        if: success() || failure()
+        run: psalm --output-format=github
+
+      - name: Run phpstan
+        if: success() || failure()
+        run: phpstan analyse

@@ -1,7 +1,7 @@
 # CakePHP JWT Authenticate plugin
 
-[![Build Status](https://img.shields.io/travis/ADmad/cakephp-jwt-auth/master.svg?style=flat-square)](https://travis-ci.org/ADmad/cakephp-jwt-auth)
-[![Coverage](https://img.shields.io/codecov/c/github/ADmad/cakephp-jwt-auth.svg?style=flat-square)](https://codecov.io/github/ADmad/cakephp-jwt-auth)
+[![Build Status](https://img.shields.io/github/workflow/status/ADmad/cakephp-jwt-auth/CI/master?style=flat-square)](https://github.com/ADmad/cakephp-jwt-auth/actions?query=workflow%3ACI+branch%3Amaster)
+[![Coverage Status](https://img.shields.io/codecov/c/github/ADmad/cakephp-jwt-auth.svg?style=flat-square)](https://codecov.io/github/ADmad/cakephp-jwt-auth)
 [![Total Downloads](https://img.shields.io/packagist/dt/ADmad/cakephp-jwt-auth.svg?style=flat-square)](https://packagist.org/packages/ADmad/cakephp-jwt-auth)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE.txt)
 
@@ -17,14 +17,7 @@ composer require admad/cakephp-jwt-auth
 
 ## Usage
 
-In your app's `config/bootstrap.php` add:
-
-```php
-// In config/bootstrap.php
-Plugin::load('ADmad/JwtAuth');
-```
-
-or using cake's console:
+Load the plugin using Cake's console:
 
 ```sh
 ./bin/cake plugin load ADmad/JwtAuth
@@ -36,7 +29,7 @@ Setup `AuthComponent`:
 
 ```php
     // In your controller, for e.g. src/Api/AppController.php
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
 
@@ -97,9 +90,9 @@ The authentication class checks for the token in two locations:
   RewriteCond %{HTTP:Authorization} ^(.*)
   RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
   ```
-  
+
   or
-  
+
   ```
   SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
   ```
@@ -109,8 +102,10 @@ The authentication class checks for the token in two locations:
 You can use `\Firebase\JWT\JWT::encode()` of the [firebase/php-jwt](https://github.com/firebase/php-jwt)
 lib, which this plugin depends on, to generate tokens.
 
-**The payload should have the "sub" (subject) claim whose value is used to query the
+**The payload must have the "sub" (subject) claim whose value is used to query the
 Users model and find record matching the "id" field.**
+
+Ideally you should also specify the token expiry time using `exp` claim.
 
 You can set the `queryDatasource` option to `false` to directly return the token's
 payload as user info without querying datasource for matching user record.

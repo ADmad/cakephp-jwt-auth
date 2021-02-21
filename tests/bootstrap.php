@@ -1,5 +1,5 @@
 <?php
-use Cake\Core\Plugin;
+declare(strict_types=1);
 
 /*
  * Test suite bootstrap
@@ -22,5 +22,3 @@ $root = $findRoot(__FILE__);
 unset($findRoot);
 chdir($root);
 require $root . '/vendor/cakephp/cakephp/tests/bootstrap.php';
-
-Plugin::load('ADmad/JwtAuth', ['path' => dirname(dirname(__FILE__)) . DS]);

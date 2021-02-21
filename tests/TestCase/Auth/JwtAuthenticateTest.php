@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ADmad\JwtAuth\Auth\Test\TestCase\Auth;
 
 use ADmad\JwtAuth\Auth\JwtAuthenticate;
@@ -7,10 +9,11 @@ use Cake\Core\Configure;
 use Cake\Http\Exception\UnauthorizedException;
 use Cake\Http\Response;
 use Cake\Http\ServerRequest;
+use Cake\I18n\FrozenTime;
 use Cake\I18n\Time;
-use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
+use DomainException;
 use Firebase\JWT\JWT;
 
 /**
@@ -18,9 +21,9 @@ use Firebase\JWT\JWT;
  */
 class JwtAuthenticateTest extends TestCase
 {
-    public $fixtures = [
-        'plugin.ADmad\JwtAuth.users',
-        'plugin.ADmad\JwtAuth.groups',
+    protected $fixtures = [
+        'plugin.ADmad\JwtAuth.Users',
+        'plugin.ADmad\JwtAuth.Groups',
     ];
 
     /**
@@ -28,7 +31,7 @@ class JwtAuthenticateTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -69,7 +72,7 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testAuthenticateTokenParameter()
     {
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
 
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
@@ -79,19 +82,19 @@ class JwtAuthenticateTest extends TestCase
             'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
-            'created' => new Time('2014-03-17 01:18:23'),
-            'updated' => new Time('2014-03-17 01:20:31'),
+            'created' => new FrozenTime('2014-03-17 01:18:23'),
+            'updated' => new FrozenTime('2014-03-17 01:20:31'),
         ];
-        $request = new ServerRequest('posts/index?token=' . $this->token);
+        $request = new ServerRequest(['url' => 'posts/index?token=' . $this->token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
         $this->auth->setConfig('parameter', 'tokenname');
-        $request = new ServerRequest('posts/index?tokenname=' . $this->token);
+        $request = new ServerRequest(['url' => 'posts/index?tokenname=' . $this->token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $request = new ServerRequest('posts/index?wrongtoken=' . $this->token);
+        $request = new ServerRequest(['url' => 'posts/index?wrongtoken=' . $this->token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }
@@ -103,15 +106,15 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testAuthenticateTokenHeader()
     {
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
 
         $expected = [
             'id' => 1,
             'group_id' => 1,
             'user_name' => 'admad',
             'email' => 'admad@example.com',
-            'created' => new Time('2014-03-17 01:18:23'),
-            'updated' => new Time('2014-03-17 01:20:31'),
+            'created' => new FrozenTime('2014-03-17 01:18:23'),
+            'updated' => new FrozenTime('2014-03-17 01:20:31'),
         ];
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
         $result = $this->auth->getUser($request, $this->response);
@@ -134,7 +137,7 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testAuthenticateNoHeaderWithParameterDisabled()
     {
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
 
         $this->auth = new JwtAuthenticate($this->Registry, [
             'userModel' => 'Users',
@@ -144,7 +147,7 @@ class JwtAuthenticateTest extends TestCase
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
 
-        $request = new ServerRequest('posts/index?token=' . $this->token);
+        $request = new ServerRequest(['url' => 'posts/index?token=' . $this->token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }
@@ -164,12 +167,12 @@ class JwtAuthenticateTest extends TestCase
         $token = JWT::encode($expected, Security::getSalt());
         $this->auth->setConfig('queryDatasource', false);
 
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
 
-        $request = new ServerRequest('posts/index?token=' . $token);
+        $request = new ServerRequest(['url' => 'posts/index?token=' . $token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertEquals($expected, $result);
     }
@@ -183,48 +186,12 @@ class JwtAuthenticateTest extends TestCase
     {
         $token = JWT::encode(['id' => 4], Security::getSalt());
 
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $token);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
 
-        $request = new ServerRequest('posts/index?token=' . $token);
-        $result = $this->auth->getUser($request, $this->response);
-        $this->assertFalse($result);
-    }
-
-    /**
-     * test contain.
-     *
-     * @return void
-     */
-    public function testFindUserWithContain()
-    {
-        $request = new ServerRequest('posts/index');
-
-        $expected = [
-            'id' => 1,
-            'group_id' => 1,
-            'user_name' => 'admad',
-            'email' => 'admad@example.com',
-            'created' => new Time('2014-03-17 01:18:23'),
-            'updated' => new Time('2014-03-17 01:20:31'),
-            'group' => [
-                'id' => 1,
-                'title' => 'admin',
-            ],
-        ];
-        $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $this->token);
-
-        $this->auth->setConfig('contain', ['Groups']);
-        $table = TableRegistry::get('Users');
-        $table->belongsTo('Groups');
-
-        $result = $this->auth->getUser($request, $this->response);
-        $this->assertEquals($expected, $result);
-
-        $this->expectException('UnexpectedValueException');
-        $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer foobar');
+        $request = new ServerRequest(['url' => 'posts/index?token=' . $token]);
         $result = $this->auth->getUser($request, $this->response);
         $this->assertFalse($result);
     }
@@ -242,15 +209,15 @@ class JwtAuthenticateTest extends TestCase
     /**
      * test that with debug off for invalid token exception from JWT::decode()
      * is re-thrown.
-     *
-     * @expectedException DomainException
      */
     public function testExceptionForInvalidToken()
     {
-        $request = new ServerRequest('posts/index');
+        $this->expectException(DomainException::class);
+
+        $request = new ServerRequest();
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer this.is.invalid');
 
-        $result = $this->auth->getUser($request, $this->response);
+        $this->auth->getUser($request, $this->response);
     }
 
     /**
@@ -267,7 +234,7 @@ class JwtAuthenticateTest extends TestCase
         $this->expectException($exceptionClass);
         $this->expectExceptionMessage('Auth error');
 
-        $result = $this->auth->unauthenticated(new ServerRequest(), $this->response);
+        $this->auth->unauthenticated(new ServerRequest(), $this->response);
     }
 
     /**
@@ -289,7 +256,7 @@ class JwtAuthenticateTest extends TestCase
     public function testWithInvalidToken()
     {
         Configure::write('debug', false);
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
 
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer this.is.invalid');
         $result = $this->auth->getUser($request, $this->response);
@@ -310,14 +277,14 @@ class JwtAuthenticateTest extends TestCase
         ]);
 
         $payload = ['sub' => 100];
-        $token = Jwt::encode($payload, $key);
+        $token = JWT::encode($payload, $key);
 
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
         $request = $request->withEnv('HTTP_AUTHORIZATION', 'Bearer ' . $token);
         $result = $auth->getUser($request, $this->response);
         $this->assertEquals($payload, $result);
 
-        $request = new ServerRequest('posts/index?token=' . $token);
+        $request = new ServerRequest(['url' => '/posts/index?token=' . $token]);
         $result = $auth->getUser($request, $this->response);
         $this->assertEquals($payload, $result);
     }
@@ -329,7 +296,7 @@ class JwtAuthenticateTest extends TestCase
      */
     public function testAuthenticateCookie()
     {
-        $request = new ServerRequest('posts/index');
+        $request = new ServerRequest();
 
         $this->auth = new JwtAuthenticate($this->Registry, [
             'userModel' => 'Users',
@@ -350,7 +317,7 @@ class JwtAuthenticateTest extends TestCase
 
         $request = new ServerRequest([
             'url' => 'posts/index',
-            'cookies' => ['jwt' => $this->token]
+            'cookies' => ['jwt' => $this->token],
         ]);
 
         $result = $this->auth->getUser($request, $this->response);
@@ -359,7 +326,7 @@ class JwtAuthenticateTest extends TestCase
         $this->auth->setConfig('cookie', 'tokenname');
         $request = new ServerRequest([
             'url' => 'posts/index',
-            'cookies' => ['tokenname' => $this->token]
+            'cookies' => ['tokenname' => $this->token],
         ]);
 
         $result = $this->auth->getUser($request, $this->response);
@@ -367,7 +334,7 @@ class JwtAuthenticateTest extends TestCase
 
         $request = new ServerRequest([
             'url' => 'posts/index',
-            'cookies' => ['wrongtoken' => $this->token]
+            'cookies' => ['wrongtoken' => $this->token],
         ]);
 
         $result = $this->auth->getUser($request, $this->response);

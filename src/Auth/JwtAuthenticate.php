@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ADmad\JwtAuth\Auth;
 
 use Cake\Auth\BaseAuthenticate;
@@ -26,9 +28,8 @@ use Firebase\JWT\JWT;
  *  ]);
  * ```
  *
- * @copyright 2015-2018 ADmad
+ * @copyright 2015-Present ADmad
  * @license MIT
- *
  * @see http://jwt.io
  * @see http://tools.ietf.org/html/draft-ietf-oauth-json-web-token
  */
@@ -51,7 +52,7 @@ class JwtAuthenticate extends BaseAuthenticate
     /**
      * Exception.
      *
-     * @var \Exception
+     * @var \Throwable|null
      */
     protected $_error;
 
@@ -87,7 +88,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *   used on this request.
      * @param array $config Array of config to use.
      */
-    public function __construct(ComponentRegistry $registry, $config)
+    public function __construct(ComponentRegistry $registry, array $config)
     {
         $defaultConfig = [
             'cookie' => false,
@@ -99,10 +100,6 @@ class JwtAuthenticate extends BaseAuthenticate
             'unauthenticatedException' => UnauthorizedException::class,
             'key' => null,
         ];
-
-        if (!class_exists(UnauthorizedException::class)) {
-            $defaultConfig['unauthenticatedException'] = 'Cake\Network\Exception\UnauthorizedException';
-        }
 
         $this->setConfig($defaultConfig);
 
@@ -118,8 +115,7 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @param \Cake\Http\ServerRequest $request The request object.
      * @param \Cake\Http\Response $response Response object.
-     *
-     * @return bool|array User record array or false on failure.
+     * @return false|array User record array or false on failure.
      */
     public function authenticate(ServerRequest $request, Response $response)
     {
@@ -130,8 +126,7 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get user record based on info available in JWT.
      *
      * @param \Cake\Http\ServerRequest $request Request object.
-     *
-     * @return bool|array User record array or false on failure.
+     * @return false|array User record array or false on failure.
      */
     public function getUser(ServerRequest $request)
     {
@@ -149,7 +144,7 @@ class JwtAuthenticate extends BaseAuthenticate
             return false;
         }
 
-        $user = $this->_findUser($payload->sub);
+        $user = $this->_findUser((string)$payload->sub);
         if (!$user) {
             return false;
         }
@@ -163,10 +158,9 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get payload data.
      *
      * @param \Cake\Http\ServerRequest|null $request Request instance or null
-     *
      * @return object|null Payload object on success, null on failurec
      */
-    public function getPayload($request = null)
+    public function getPayload(?ServerRequest $request = null)
     {
         if (!$request) {
             return $this->_payload;
@@ -186,10 +180,9 @@ class JwtAuthenticate extends BaseAuthenticate
      * Get token from header or query string.
      *
      * @param \Cake\Http\ServerRequest|null $request Request object.
-     *
      * @return string|null Token string if found else null.
      */
-    public function getToken($request = null)
+    public function getToken(?ServerRequest $request = null)
     {
         $config = $this->_config;
 
@@ -205,6 +198,7 @@ class JwtAuthenticate extends BaseAuthenticate
         if (!empty($this->_config['cookie'])) {
             $token = $request->getCookie($this->_config['cookie']);
             if ($token !== null) {
+                /** @psalm-suppress PossiblyInvalidCast */
                 $token = (string)$token;
             }
 
@@ -214,6 +208,7 @@ class JwtAuthenticate extends BaseAuthenticate
         if (!empty($this->_config['parameter'])) {
             $token = $request->getQuery($this->_config['parameter']);
             if ($token !== null) {
+                /** @psalm-suppress PossiblyInvalidCast */
                 $token = (string)$token;
             }
 
@@ -227,10 +222,9 @@ class JwtAuthenticate extends BaseAuthenticate
      * Decode JWT token.
      *
      * @param string $token JWT token to decode.
-     *
      * @return object|null The JWT's payload as a PHP object, null on failure.
      */
-    protected function _decode($token)
+    protected function _decode(string $token)
     {
         $config = $this->_config;
         try {
@@ -247,6 +241,8 @@ class JwtAuthenticate extends BaseAuthenticate
             }
             $this->_error = $e;
         }
+
+        return null;
     }
 
     /**
@@ -256,10 +252,8 @@ class JwtAuthenticate extends BaseAuthenticate
      *
      * @param \Cake\Http\ServerRequest $request A request object.
      * @param \Cake\Http\Response $response A response object.
-     *
      * @throws \Cake\Http\Exception\UnauthorizedException Or any other
      *   configured exception.
-     *
      * @return void
      */
     public function unauthenticated(ServerRequest $request, Response $response)
@@ -272,6 +266,7 @@ class JwtAuthenticate extends BaseAuthenticate
             ? $this->_error->getMessage()
             : $this->_registry->get('Auth')->getConfig('authError');
 
+        /** @var \Throwable $exception */
         $exception = new $this->_config['unauthenticatedException']($message);
         throw $exception;
     }
